@@ -381,27 +381,30 @@
                 </form>
             </div>
 
-            <!-- Recent Emails -->
-            <div class="detail-card">
-                <div class="section-title">Recent Emails</div>
-                <div id="emailsContent" class="table-wrapper">
-                    <div class="empty-state">No emails yet</div>
+            <!-- Grid: Recent Emails, Documents, Installations -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                <!-- Recent Emails -->
+                <div class="detail-card">
+                    <div class="section-title">Recent Emails</div>
+                    <div id="emailsContent" class="table-wrapper">
+                        <div class="empty-state">No emails yet</div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Documents -->
-            <div class="detail-card">
-                <div class="section-title">Documents</div>
-                <div id="documentsContent" class="table-wrapper">
-                    <div class="empty-state">No documents yet</div>
+                <!-- Documents -->
+                <div class="detail-card">
+                    <div class="section-title">Documents</div>
+                    <div id="documentsContent" class="table-wrapper">
+                        <div class="empty-state">No documents yet</div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Installations -->
-            <div class="detail-card">
-                <div class="section-title">Installations</div>
-                <div id="installationsContent" class="table-wrapper">
-                    <div class="empty-state">No installations yet</div>
+                <!-- Installations -->
+                <div class="detail-card">
+                    <div class="section-title">Installations</div>
+                    <div id="installationsContent" class="table-wrapper">
+                        <div class="empty-state">No installations yet</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -903,7 +906,10 @@
         function formatDate(dateStr) {
             if (!dateStr) return '';
             const date = new Date(dateStr);
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const year = String(date.getFullYear()).slice(-2);
+            return `${month}/${day}/${year}`;
         }
 
         function showError(message) {
