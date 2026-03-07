@@ -1,0 +1,5 @@
+property_id,date_installed,paid,payment_date,notes
+P0003,2026-02-15,true,2026-02-20,Installed and paid in full
+P0004,2026-02-20,true,2026-02-22,Great installation - happy customer
+P0008,2026-02-25,true,2026-02-28,Installation completed smoothly
+P0006,2026-03-01,false,,Installation scheduled for next week - payment pending

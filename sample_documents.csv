@@ -1,0 +1,10 @@
+property_id,document_type,date_sent,date_signed,notes
+P0001,IA,2026-03-07,2026-03-08,Signed and returned same day
+P0003,IA,2026-03-05,2026-03-07,Board approved version
+P0004,IA,2026-03-07,2026-03-07,Quick turnaround - very interested
+P0006,IA,2026-03-06,2026-03-09,Sent board version
+P0008,IA,2026-03-07,2026-03-07,Signed immediately
+P0003,TPV,2026-03-09,2026-03-10,TPV scheduled
+P0004,TPV,2026-03-08,2026-03-08,TPV completed same day
+P0006,TPV,2026-03-10,2026-03-11,Waiting for full board meeting
+P0008,TPV,2026-03-08,2026-03-08,Completed

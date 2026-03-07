@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Details - CRM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #1a2332;
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .btn-back {
+            padding: 10px 20px;
+            background: #2a3f5f;
+            color: #a0aec0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: #3a5f7f;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #a0aec0;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #2a3f5f;
+            border-top: 3px solid #4fa3ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .detail-card {
+            background: #1e2d42;
+            border: 1px solid #2a3f5f;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .property-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .property-id {
+            font-size: 14px;
+            color: #4fa3ff;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .property-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            margin-top: 5px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: rgba(52, 168, 83, 0.2);
+            color: #34A853;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            color: #a0aec0;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .info-value {
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .info-value a {
+            color: #4fa3ff;
+            text-decoration: none;
+        }
+
+        .info-value a:hover {
+            text-decoration: underline;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #2a3f5f;
+            padding-bottom: 10px;
+        }
+
+        .table-wrapper {
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            border-bottom: 2px solid #2a3f5f;
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #a0aec0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 11px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #2a3f5f;
+            color: #e0e0e0;
+        }
+
+        tbody tr:hover {
+            background: #263549;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #a0aec0;
+            font-size: 13px;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Property Details</h1>
+            <button class="btn-back" onclick="window.location.href='Properties.html'">← Back to Properties</button>
+        </div>
+
+        <div id="loading" class="loading">
+            <span class="spinner"></span>Loading property...
+        </div>
+
+        <div id="content" style="display: none;">
+            <div class="detail-card">
+                <div class="property-header">
+                    <div>
+                        <div class="property-id" id="propertyId"></div>
+                        <div class="property-name" id="propertyName"></div>
+                        <div class="status-badge" id="status"></div>
+                        <div class="info-item" style="margin-top: 15px;">
+                            <div class="info-label">Address</div>
+                            <div class="info-value" id="address"></div>
+                        </div>
+                        <div class="info-item" style="margin-top: 12px;">
+                            <div class="info-label">URL</div>
+                            <div class="info-value"><a id="propertyUrl" href="" target="_blank">Visit Website</a></div>
+                        </div>
+                        <div class="info-item" style="margin-top: 12px;">
+                            <div class="info-label">Phone</div>
+                            <div class="info-value" id="phone"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="border-bottom: 1px solid #2a3f5f; padding-bottom: 15px;">
+                            <div class="info-label" style="margin-bottom: 15px;">Status Tracking</div>
+
+                            <div class="info-item" style="margin-bottom: 12px;">
+                                <div class="info-label">IA Status</div>
+                                <select id="iaStatusSelect" onchange="updateIAStatus()" style="width: 100%; padding: 4px 6px; background: #0f1419; border: 1px solid #2a3f5f; color: #e0e0e0; border-radius: 6px; font-size: 12px;">
+                                    <option value="">Not Started</option>
+                                    <option value="Sent">Sent</option>
+                                    <option value="Signed">Signed</option>
+                                </select>
+                                <div class="info-value" id="iaStatusDate" style="margin-top: 5px; font-size: 12px; color: #4fa3ff;"></div>
+                            </div>
+
+                            <div class="info-item" style="margin-bottom: 12px;">
+                                <div class="info-label">TPV Status</div>
+                                <select id="tpvStatusSelect" onchange="updateTPVStatus()" style="width: 100%; padding: 4px 6px; background: #0f1419; border: 1px solid #2a3f5f; color: #e0e0e0; border-radius: 6px; font-size: 12px;">
+                                    <option value="">Not Started</option>
+                                    <option value="Sent">Sent</option>
+                                    <option value="Signed">Signed</option>
+                                </select>
+                                <div class="info-value" id="tpvStatusDate" style="margin-top: 5px; font-size: 12px; color: #4fa3ff;"></div>
+                            </div>
+
+                            <div class="info-item" style="margin-bottom: 12px;">
+                                <div class="info-label">Installation Date</div>
+                                <input type="date" id="installDateInput" onchange="updateInstallDate()" style="width: 100%; padding: 4px 6px; background: #0f1419; border: 1px solid #2a3f5f; color: #e0e0e0; border-radius: 6px; font-size: 12px;">
+                                <div style="font-size: 11px; color: #a0aec0; margin-top: 3px;">Pick date manually from calendar</div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-label">Paid Status</div>
+                                <select id="paidStatusSelect" onchange="updatePaidStatus()" style="width: 100%; padding: 4px 6px; background: #0f1419; border: 1px solid #2a3f5f; color: #e0e0e0; border-radius: 6px; font-size: 12px;">
+                                    <option value="false">Not Paid</option>
+                                    <option value="true">Paid ✓</option>
+                                </select>
+                            </div>
+
+                            <div id="statusMessage" style="margin-top: 12px; padding: 8px; border-radius: 6px; text-align: center; font-size: 12px; display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Units</div>
+                        <div class="info-value" id="units"></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Agent</div>
+                        <div class="info-value" id="agent"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Log Call Form -->
+            <div class="detail-card">
+                <div class="section-title">Log New Call</div>
+                <form id="callForm" onsubmit="saveCall(event)">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div>
+                            <label style="display: block; color: #a0aec0; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Date Called *</label>
+                            <input type="date" id="callDate" required style="width: 100%; padding: 10px; background: #0f1419; border: 1px solid #2a3f5f; color: #e0e0e0; border-radius: 6px;">
+                        </div>
+                        <div>
+                            <label style="display: block; color: #a0aec0; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Interaction Type *</label>
+                            <select id="interactionType" required style="width: 100%; padding: 10px; background: #0f1419; border: 1px solid #2a3f5f; color: #e0e0e0; border-radius: 6px;">
+                                <option value="">Select type</option>
+                                <option value="Spoke With">Spoke With</option>
+                                <option value="Voicemail">Voicemail</option>
+                                <option value="No Answer">No Answer</option>
+                                <option value="Wrong Number">Wrong Number</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; color: #a0aec0; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Spoke With</label>
+                        <input type="text" id="spokeWith" placeholder="e.g., John Manager" style="width: 100%; padding: 10px; background: #0f1419; border: 1px solid #2a3f5f; color: #e0e0e0; border-radius: 6px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; color: #a0aec0; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Next Follow-up Date</label>
+                        <input type="date" id="nextFollowup" style="width: 100%; padding: 10px; background: #0f1419; border: 1px solid #2a3f5f; color: #e0e0e0; border-radius: 6px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; color: #a0aec0; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Notes</label>
+                        <textarea id="notes" placeholder="Call details..." style="width: 100%; padding: 10px; background: #0f1419; border: 1px solid #2a3f5f; color: #e0e0e0; border-radius: 6px; min-height: 60px;"></textarea>
+                    </div>
+                    <div id="callMessage" style="margin-bottom: 15px; display: none; padding: 10px; border-radius: 6px; text-align: center;"></div>
+                    <button type="submit" style="background: #22c55e; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%;">Save Call</button>
+                </form>
+            </div>
+
+            <!-- Recent Calls -->
+            <div class="detail-card">
+                <div class="section-title">Recent Calls</div>
+                <div id="callsContent" class="table-wrapper">
+                    <div class="empty-state">No calls logged yet</div>
+                </div>
+            </div>
+
+            <!-- Log Email Form -->
+            <div class="detail-card">
+                <div class="section-title">Log New Email</div>
+                <form id="emailForm" onsubmit="saveEmail(event)">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div>
+                            <label style="display: block; color: #a0aec0; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Email Type *</label>
+                            <select id="emailType" required style="width: 100%; padding: 10px; background: #0f1419; border: 1px solid #2a3f5f; color: #e0e0e0; border-radius: 6px;">
+                                <option value="">Select type</option>
+                                <option value="Intro">Intro</option>
+                                <option value="Follow-up">Follow-up</option>
+                                <option value="Break-up">Break-up</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; color: #a0aec0; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Date Sent *</label>
+                            <input type="date" id="emailDate" required style="width: 100%; padding: 10px; background: #0f1419; border: 1px solid #2a3f5f; color: #e0e0e0; border-radius: 6px;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; color: #a0aec0; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Status *</label>
+                        <select id="emailStatus" required style="width: 100%; padding: 10px; background: #0f1419; border: 1px solid #2a3f5f; color: #e0e0e0; border-radius: 6px;">
+                            <option value="">Select status</option>
+                            <option value="Sent">Sent</option>
+                            <option value="Responded">Responded</option>
+                            <option value="No Response">No Response</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; color: #a0aec0; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Notes</label>
+                        <textarea id="emailNotes" placeholder="Email details..." style="width: 100%; padding: 10px; background: #0f1419; border: 1px solid #2a3f5f; color: #e0e0e0; border-radius: 6px; min-height: 60px;"></textarea>
+                    </div>
+                    <div id="emailMessage" style="margin-bottom: 15px; display: none; padding: 10px; border-radius: 6px; text-align: center;"></div>
+                    <button type="submit" style="background: #22c55e; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%;">Save Email</button>
+                </form>
+            </div>
+
+            <!-- Recent Emails -->
+            <div class="detail-card">
+                <div class="section-title">Recent Emails</div>
+                <div id="emailsContent" class="table-wrapper">
+                    <div class="empty-state">No emails yet</div>
+                </div>
+            </div>
+
+            <!-- Documents -->
+            <div class="detail-card">
+                <div class="section-title">Documents</div>
+                <div id="documentsContent" class="table-wrapper">
+                    <div class="empty-state">No documents yet</div>
+                </div>
+            </div>
+
+            <!-- Installations -->
+            <div class="detail-card">
+                <div class="section-title">Installations</div>
+                <div id="installationsContent" class="table-wrapper">
+                    <div class="empty-state">No installations yet</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="error" style="display: none;">
+            <div class="error" id="errorText"></div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = "https://blhxgcncijmxxhleqmri.supabase.co";
+        const SUPABASE_API_KEY = "sb_publishable_T9uXncJJ9m-4fV7xDLzWPA_enkmnDHi";
+
+        // Get property ID from URL parameter
+        function getPropertyId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        // Fetch data from Supabase
+        async function fetchSupabaseData(table, filters = '') {
+            try {
+                const url = `${SUPABASE_URL}/rest/v1/${table}${filters}`;
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ${table}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error(`Error fetching ${table}:`, error);
+                return [];
+            }
+        }
+
+        // Set today's date in date inputs
+        function setTodayDate() {
+            const today = new Date().toISOString().split('T')[0];
+            const callDateInput = document.getElementById('callDate');
+            const emailDateInput = document.getElementById('emailDate');
+            if (callDateInput) callDateInput.value = today;
+            if (emailDateInput) emailDateInput.value = today;
+        }
+
+        // Load property details
+        async function loadPropertyDetails() {
+            const propertyId = getPropertyId();
+
+            if (!propertyId) {
+                showError('No property ID provided');
+                return;
+            }
+
+            // Set today's date in forms
+            setTodayDate();
+
+            try {
+                // Fetch property
+                const properties = await fetchSupabaseData('properties', `?property_id=eq.${propertyId}`);
+
+                if (!properties || properties.length === 0) {
+                    showError('Property not found');
+                    return;
+                }
+
+                const property = properties[0];
+                displayProperty(property);
+
+                // Fetch related data
+                const calls = await fetchSupabaseData('calls', `?property_id=eq.${propertyId}`);
+                const emails = await fetchSupabaseData('emails', `?property_id=eq.${propertyId}`);
+                const documents = await fetchSupabaseData('documents', `?property_id=eq.${propertyId}`);
+                const installations = await fetchSupabaseData('installations', `?property_id=eq.${propertyId}`);
+
+                displayCalls(calls);
+                displayEmails(emails);
+                displayDocuments(documents);
+                displayInstallations(installations);
+                displayStatusTracking(documents, installations);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        function displayProperty(property) {
+            document.getElementById('propertyId').textContent = property.property_id || 'N/A';
+            document.getElementById('propertyName').textContent = property.property_name || 'Unknown';
+            document.getElementById('address').textContent = property.address || 'N/A';
+            document.getElementById('phone').textContent = property.phone_number || 'N/A';
+            document.getElementById('units').textContent = property.units || 'N/A';
+            document.getElementById('agent').textContent = property.agent || 'N/A';
+            document.getElementById('status').textContent = property.status || 'New';
+
+            if (property.url) {
+                document.getElementById('propertyUrl').href = property.url;
+            }
+        }
+
+        function displayCalls(calls) {
+            const container = document.getElementById('callsContent');
+            if (!calls || calls.length === 0) {
+                container.innerHTML = '<div class="empty-state">No calls logged yet</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Spoke With</th>
+                            <th>Next Follow-up</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            calls.forEach(call => {
+                html += `
+                    <tr>
+                        <td>${formatDate(call.date_called) || '-'}</td>
+                        <td>${call.interaction_type || '-'}</td>
+                        <td>${call.spoke_with || 'N/A'}</td>
+                        <td>${formatDate(call.next_followup_date) || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function displayEmails(emails) {
+            const container = document.getElementById('emailsContent');
+            if (!emails || emails.length === 0) {
+                container.innerHTML = '<div class="empty-state">No emails yet</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Date Sent</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            emails.forEach(email => {
+                html += `
+                    <tr>
+                        <td>${email.email_type || '-'}</td>
+                        <td>${formatDate(email.date_sent) || '-'}</td>
+                        <td>${email.status || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function displayDocuments(documents) {
+            const container = document.getElementById('documentsContent');
+            if (!documents || documents.length === 0) {
+                container.innerHTML = '<div class="empty-state">No documents yet</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Document Type</th>
+                            <th>Date Sent</th>
+                            <th>Date Signed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            documents.forEach(doc => {
+                html += `
+                    <tr>
+                        <td>${doc.document_type || '-'}</td>
+                        <td>${formatDate(doc.date_sent) || '-'}</td>
+                        <td>${formatDate(doc.date_signed) || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function displayInstallations(installations) {
+            const container = document.getElementById('installationsContent');
+            if (!installations || installations.length === 0) {
+                container.innerHTML = '<div class="empty-state">No installations yet</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date Installed</th>
+                            <th>Paid</th>
+                            <th>Payment Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            installations.forEach(inst => {
+                const paid = inst.paid ? '✓ Yes' : '✗ No';
+                html += `
+                    <tr>
+                        <td>${formatDate(inst.date_installed) || '-'}</td>
+                        <td>${paid}</td>
+                        <td>${formatDate(inst.payment_date) || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function displayStatusTracking(documents, installations) {
+            // Get IA status
+            const iaDoc = documents && documents.find(d => d.document_type === 'IA');
+            window.currentIADoc = iaDoc;
+            let iaStatusValue = '';
+            let iaDateDisplay = '';
+            if (iaDoc) {
+                if (iaDoc.date_signed) {
+                    iaStatusValue = 'Signed';
+                    iaDateDisplay = `Signed - ${formatDate(iaDoc.date_signed)}`;
+                } else if (iaDoc.date_sent) {
+                    iaStatusValue = 'Sent';
+                    iaDateDisplay = `Sent - ${formatDate(iaDoc.date_sent)}`;
+                }
+            }
+            document.getElementById('iaStatusSelect').value = iaStatusValue;
+            document.getElementById('iaStatusDate').textContent = iaDateDisplay;
+
+            // Get TPV status
+            const tpvDoc = documents && documents.find(d => d.document_type === 'TPV');
+            window.currentTPVDoc = tpvDoc;
+            let tpvStatusValue = '';
+            let tpvDateDisplay = '';
+            if (tpvDoc) {
+                if (tpvDoc.date_signed) {
+                    tpvStatusValue = 'Signed';
+                    tpvDateDisplay = `Signed - ${formatDate(tpvDoc.date_signed)}`;
+                } else if (tpvDoc.date_sent) {
+                    tpvStatusValue = 'Sent';
+                    tpvDateDisplay = `Sent - ${formatDate(tpvDoc.date_sent)}`;
+                }
+            }
+            document.getElementById('tpvStatusSelect').value = tpvStatusValue;
+            document.getElementById('tpvStatusDate').textContent = tpvDateDisplay;
+
+            // Get installation status
+            window.currentInstallation = null;
+            let installDateValue = '';
+            let paidStatusValue = 'false';
+            if (installations && installations.length > 0) {
+                const inst = installations[0];
+                window.currentInstallation = inst;
+                if (inst.date_installed) {
+                    installDateValue = inst.date_installed;
+                }
+                paidStatusValue = inst.paid ? 'true' : 'false';
+            }
+            document.getElementById('installDateInput').value = installDateValue;
+            document.getElementById('paidStatusSelect').value = paidStatusValue;
+        }
+
+        async function updateIAStatus() {
+            const propertyId = getPropertyId();
+            const status = document.getElementById('iaStatusSelect').value;
+            // Get today's date in local timezone
+            const now = new Date();
+            const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+
+            try {
+                if (!window.currentIADoc) {
+                    // Create new IA document
+                    const docData = {
+                        property_id: propertyId,
+                        document_type: 'IA',
+                        date_sent: status ? today : null,
+                        date_signed: status === 'Signed' ? today : null
+                    };
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/documents`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(docData)
+                    });
+                    if (!response.ok) throw new Error('Failed to create IA document');
+                } else {
+                    // Update existing IA document
+                    const updateData = {};
+                    if (status === 'Sent') {
+                        updateData.date_sent = today;
+                        updateData.date_signed = null;
+                    } else if (status === 'Signed') {
+                        updateData.date_signed = today;
+                    } else {
+                        updateData.date_sent = null;
+                        updateData.date_signed = null;
+                    }
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/documents?id=eq.${window.currentIADoc.id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updateData)
+                    });
+                    if (!response.ok) throw new Error('Failed to update IA document');
+                }
+                showStatusMessage('IA Status updated!');
+                setTimeout(() => loadPropertyDetails(), 1500);
+            } catch (error) {
+                showStatusMessage('Error: ' + error.message, true);
+            }
+        }
+
+        async function updateTPVStatus() {
+            const propertyId = getPropertyId();
+            const status = document.getElementById('tpvStatusSelect').value;
+            // Get today's date in local timezone
+            const now = new Date();
+            const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+
+            try {
+                if (!window.currentTPVDoc) {
+                    // Create new TPV document
+                    const docData = {
+                        property_id: propertyId,
+                        document_type: 'TPV',
+                        date_sent: status ? today : null,
+                        date_signed: status === 'Signed' ? today : null
+                    };
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/documents`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(docData)
+                    });
+                    if (!response.ok) throw new Error('Failed to create TPV document');
+                } else {
+                    // Update existing TPV document
+                    const updateData = {};
+                    if (status === 'Sent') {
+                        updateData.date_sent = today;
+                        updateData.date_signed = null;
+                    } else if (status === 'Signed') {
+                        updateData.date_signed = today;
+                    } else {
+                        updateData.date_sent = null;
+                        updateData.date_signed = null;
+                    }
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/documents?id=eq.${window.currentTPVDoc.id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updateData)
+                    });
+                    if (!response.ok) throw new Error('Failed to update TPV document');
+                }
+                showStatusMessage('TPV Status updated!');
+                setTimeout(() => loadPropertyDetails(), 1500);
+            } catch (error) {
+                showStatusMessage('Error: ' + error.message, true);
+            }
+        }
+
+        async function updateInstallDate() {
+            const propertyId = getPropertyId();
+            const installDate = document.getElementById('installDateInput').value;
+
+            try {
+                if (!window.currentInstallation) {
+                    // Create new installation
+                    const instData = {
+                        property_id: propertyId,
+                        date_installed: installDate || null,
+                        paid: false
+                    };
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/installations`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(instData)
+                    });
+                    if (!response.ok) throw new Error('Failed to create installation');
+                } else {
+                    // Update existing installation
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/installations?id=eq.${window.currentInstallation.id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ date_installed: installDate || null })
+                    });
+                    if (!response.ok) throw new Error('Failed to update installation date');
+                }
+                showStatusMessage('Installation date updated!');
+            } catch (error) {
+                showStatusMessage('Error: ' + error.message, true);
+            }
+        }
+
+        async function updatePaidStatus() {
+            const propertyId = getPropertyId();
+            const paid = document.getElementById('paidStatusSelect').value === 'true';
+            // Get today's date in local timezone
+            const now = new Date();
+            const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+
+            try {
+                if (!window.currentInstallation) {
+                    // Create new installation
+                    const instData = {
+                        property_id: propertyId,
+                        paid: paid,
+                        payment_date: paid ? today : null
+                    };
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/installations`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(instData)
+                    });
+                    if (!response.ok) throw new Error('Failed to create installation');
+                } else {
+                    // Update existing installation
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/installations?id=eq.${window.currentInstallation.id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            paid: paid,
+                            payment_date: paid ? today : null
+                        })
+                    });
+                    if (!response.ok) throw new Error('Failed to update paid status');
+                }
+                showStatusMessage('Paid status updated!');
+                setTimeout(() => loadPropertyDetails(), 1500);
+            } catch (error) {
+                showStatusMessage('Error: ' + error.message, true);
+            }
+        }
+
+        function showStatusMessage(message, isError = false) {
+            const messageEl = document.getElementById('statusMessage');
+            messageEl.style.display = 'block';
+            messageEl.style.background = isError ? 'rgba(239, 68, 68, 0.2)' : 'rgba(34, 197, 94, 0.2)';
+            messageEl.style.color = isError ? '#ff6b6b' : '#22c55e';
+            messageEl.textContent = isError ? '✗ ' + message : '✓ ' + message;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('errorText').textContent = '⚠️ ' + message;
+        }
+
+        // Save call
+        async function saveCall(event) {
+            event.preventDefault();
+
+            const propertyId = getPropertyId();
+            const callData = {
+                property_id: propertyId,
+                date_called: document.getElementById('callDate').value,
+                interaction_type: document.getElementById('interactionType').value,
+                spoke_with: document.getElementById('spokeWith').value,
+                notes: document.getElementById('notes').value,
+                next_followup_date: document.getElementById('nextFollowup').value || null
+            };
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/calls`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(callData)
+                });
+
+                if (!response.ok) throw new Error('Failed to save call');
+
+                // Show success message
+                const messageEl = document.getElementById('callMessage');
+                messageEl.style.display = 'block';
+                messageEl.style.background = 'rgba(34, 197, 94, 0.2)';
+                messageEl.style.color = '#22c55e';
+                messageEl.textContent = '✓ Call saved successfully!';
+
+                // Clear form
+                document.getElementById('callForm').reset();
+                document.getElementById('callDate').valueAsDate = new Date();
+
+                // Reload calls list
+                setTimeout(() => {
+                    loadPropertyDetails();
+                    messageEl.style.display = 'none';
+                }, 2000);
+
+            } catch (error) {
+                const messageEl = document.getElementById('callMessage');
+                messageEl.style.display = 'block';
+                messageEl.style.background = 'rgba(239, 68, 68, 0.2)';
+                messageEl.style.color = '#ff6b6b';
+                messageEl.textContent = '✗ Error: ' + error.message;
+            }
+        }
+
+        // Save email
+        async function saveEmail(event) {
+            event.preventDefault();
+
+            const propertyId = getPropertyId();
+            const emailData = {
+                property_id: propertyId,
+                email_type: document.getElementById('emailType').value,
+                date_sent: document.getElementById('emailDate').value,
+                status: document.getElementById('emailStatus').value,
+                notes: document.getElementById('emailNotes').value || ''
+            };
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/emails`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(emailData)
+                });
+
+                if (!response.ok) throw new Error('Failed to save email');
+
+                // Show success message
+                const messageEl = document.getElementById('emailMessage');
+                messageEl.style.display = 'block';
+                messageEl.style.background = 'rgba(34, 197, 94, 0.2)';
+                messageEl.style.color = '#22c55e';
+                messageEl.textContent = '✓ Email logged successfully!';
+
+                // Clear form
+                document.getElementById('emailForm').reset();
+                document.getElementById('emailDate').valueAsDate = new Date();
+
+                // Reload emails list
+                setTimeout(() => {
+                    loadPropertyDetails();
+                    messageEl.style.display = 'none';
+                }, 2000);
+
+            } catch (error) {
+                const messageEl = document.getElementById('emailMessage');
+                messageEl.style.display = 'block';
+                messageEl.style.background = 'rgba(239, 68, 68, 0.2)';
+                messageEl.style.color = '#ff6b6b';
+                messageEl.textContent = '✗ Error: ' + error.message;
+            }
+        }
+
+        // Load on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadPropertyDetails);
+        } else {
+            loadPropertyDetails();
+        }
+    </script>
+</body>
+</html>

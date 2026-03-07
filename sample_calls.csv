@@ -1,0 +1,11 @@
+property_id,date_called,interaction_type,spoke_with,notes,next_followup_date
+P0001,2026-03-06,Spoke With,John Manager,Very interested in the program,2026-03-13
+P0002,2026-03-05,Voicemail,N/A,Left message about program benefits,2026-03-12
+P0003,2026-03-04,Spoke With,Sarah Director,Has questions about installation,2026-03-11
+P0004,2026-03-07,Spoke With,Mike Owner,Ready to move forward,2026-03-14
+P0005,2026-03-06,No Answer,N/A,No one answered,2026-03-13
+P0006,2026-03-05,Spoke With,Lisa Manager,Needs board approval first,2026-03-12
+P0007,2026-03-03,Voicemail,N/A,Left callback request,2026-03-10
+P0008,2026-03-07,Spoke With,Tom Owner,Very interested,2026-03-14
+P0009,2026-03-04,Wrong Number,N/A,Number disconnected,2026-03-11
+P0010,2026-03-06,Spoke With,Jessica Manager,Sent introductory materials,2026-03-13

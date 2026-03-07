@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Properties - CRM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #1a2332;
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            padding: 10px 15px;
+            border: 1px solid #2a3f5f;
+            border-radius: 6px;
+            background: #0f1419;
+            color: #e0e0e0;
+            font-size: 14px;
+            width: 250px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4fa3ff;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: #2a3f5f;
+            color: #a0aec0;
+        }
+
+        .btn-secondary:hover {
+            background: #3a5f7f;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #a0aec0;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #2a3f5f;
+            border-top: 3px solid #4fa3ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .table-wrapper {
+            background: #1e2d42;
+            border: 1px solid #2a3f5f;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: #0f1419;
+            border-bottom: 2px solid #2a3f5f;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #a0aec0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 12px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #2a3f5f;
+            color: #e0e0e0;
+        }
+
+        tbody tr:hover {
+            background: #263549;
+        }
+
+        .property-name {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .property-id {
+            color: #4fa3ff;
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-contacted {
+            background: rgba(52, 168, 83, 0.2);
+            color: #34A853;
+        }
+
+        .badge-ia-sent {
+            background: rgba(251, 188, 4, 0.2);
+            color: #FBBC04;
+        }
+
+        .badge-ia-signed {
+            background: rgba(100, 200, 255, 0.2);
+            color: #64c8ff;
+        }
+
+        .badge-installed {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0aec0;
+        }
+
+        .empty-state p {
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .status-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(79, 163, 255, 0.1);
+            border: 1px solid #4fa3ff;
+            border-radius: 6px;
+            color: #a0aec0;
+            font-size: 13px;
+        }
+
+        .count {
+            color: #a0aec0;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👥 All Properties</h1>
+            <div class="controls">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search properties..."
+                    onkeyup="filterProperties()"
+                >
+                <select id="statusFilter" onchange="filterProperties()" style="padding: 10px 15px; border: 1px solid #2a3f5f; border-radius: 6px; background: #0f1419; color: #e0e0e0; font-size: 14px;">
+                    <option value="">All Statuses</option>
+                    <option value="Contacted">Contacted</option>
+                    <option value="IA Sent">IA Sent</option>
+                    <option value="IA Signed">IA Signed</option>
+                    <option value="TPV Sent">TPV Sent</option>
+                    <option value="TPV Signed">TPV Signed</option>
+                    <option value="Installed">Installed</option>
+                    <option value="Voicemail Left">Voicemail Left</option>
+                    <option value="No Answer">No Answer</option>
+                </select>
+                <select id="agentFilter" onchange="filterProperties()" style="padding: 10px 15px; border: 1px solid #2a3f5f; border-radius: 6px; background: #0f1419; color: #e0e0e0; font-size: 14px;">
+                    <option value="">All Agents</option>
+                </select>
+                <button class="btn-primary" onclick="goToDashboard()">← Back to Dashboard</button>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">
+            <span class="spinner"></span>Loading properties...
+        </div>
+
+        <div id="tableContainer" style="display: none;">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Property ID</th>
+                            <th>Property Name</th>
+                            <th>Address</th>
+                            <th>Phone</th>
+                            <th>Units</th>
+                            <th>Agent</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="propertiesTable">
+                    </tbody>
+                </table>
+            </div>
+            <div class="count" id="propertyCount"></div>
+        </div>
+
+        <div id="emptyState" style="display: none;">
+            <div class="empty-state">
+                <p>No properties found</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = "https://blhxgcncijmxxhleqmri.supabase.co";
+        const SUPABASE_API_KEY = "sb_publishable_T9uXncJJ9m-4fV7xDLzWPA_enkmnDHi";
+
+        let allProperties = [];
+
+        // Fetch properties from Supabase
+        async function loadProperties() {
+            try {
+                console.log('Fetching from:', `${SUPABASE_URL}/rest/v1/properties`);
+
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/properties`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    }
+                });
+
+                console.log('Response status:', response.status);
+                const text = await response.text();
+                console.log('Response text:', text);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${text}`);
+                }
+
+                allProperties = JSON.parse(text);
+                console.log('Loaded properties:', allProperties);
+
+                document.getElementById('loading').style.display = 'none';
+                populateAgentFilter();
+                displayProperties(allProperties);
+
+            } catch (error) {
+                console.error('Error loading properties:', error);
+                document.getElementById('loading').style.display = 'none';
+
+                // Show error message
+                const emptyState = document.getElementById('emptyState');
+                emptyState.innerHTML = `
+                    <div class="empty-state">
+                        <p>⚠️ Error loading properties</p>
+                        <p style="font-size: 12px; color: #666;">${error.message}</p>
+                        <p style="font-size: 12px; margin-top: 20px;">Check browser console (F12) for details</p>
+                    </div>
+                `;
+                emptyState.style.display = 'block';
+            }
+        }
+
+        function displayProperties(properties) {
+            const tableBody = document.getElementById('propertiesTable');
+            const tableContainer = document.getElementById('tableContainer');
+            const emptyState = document.getElementById('emptyState');
+
+            if (!properties || properties.length === 0) {
+                tableContainer.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            tableContainer.style.display = 'block';
+            emptyState.style.display = 'none';
+
+            tableBody.innerHTML = '';
+
+            properties.forEach(prop => {
+                const row = document.createElement('tr');
+                const statusBadge = getStatusBadge(prop.status);
+
+                row.innerHTML = `
+                    <td><a href="PropertyDetail.html?id=${prop.property_id}" style="color: #4fa3ff; font-weight: 600; text-decoration: none; cursor: pointer;">${prop.property_id || 'N/A'}</a></td>
+                    <td><span class="property-name">${prop.property_name || 'N/A'}</span></td>
+                    <td>${prop.address || 'N/A'}</td>
+                    <td>${prop.phone_number || 'N/A'}</td>
+                    <td>${prop.units || 'N/A'}</td>
+                    <td>${prop.agent || 'N/A'}</td>
+                    <td>${statusBadge}</td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+
+            document.getElementById('propertyCount').textContent = `Showing ${properties.length} properties`;
+        }
+
+        function populateAgentFilter() {
+            // Get unique agents
+            const agents = [...new Set(allProperties.map(p => p.agent).filter(a => a))].sort();
+            const agentSelect = document.getElementById('agentFilter');
+
+            agents.forEach(agent => {
+                const option = document.createElement('option');
+                option.value = agent;
+                option.textContent = agent;
+                agentSelect.appendChild(option);
+            });
+        }
+
+        function getStatusBadge(status) {
+            const badgeMap = {
+                'Contacted': 'badge-contacted',
+                'IA Sent': 'badge-ia-sent',
+                'IA Signed': 'badge-ia-signed',
+                'TPV Sent': 'badge-ia-sent',
+                'TPV Signed': 'badge-ia-signed',
+                'Installed': 'badge-installed',
+                'Paid': 'badge-installed'
+            };
+
+            const badgeClass = badgeMap[status] || 'badge-contacted';
+            return `<span class="badge ${badgeClass}">${status || 'New'}</span>`;
+        }
+
+        function filterProperties() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const agentFilter = document.getElementById('agentFilter').value;
+
+            const filtered = allProperties.filter(prop => {
+                // Text search filter
+                const searchFields = [
+                    prop.property_id,
+                    prop.property_name,
+                    prop.address,
+                    prop.agent,
+                    prop.phone_number
+                ].map(field => (field || '').toString().toLowerCase());
+
+                const matchesSearch = searchFields.some(field => field.includes(searchTerm));
+
+                // Status filter
+                const matchesStatus = !statusFilter || prop.status === statusFilter;
+
+                // Agent filter
+                const matchesAgent = !agentFilter || prop.agent === agentFilter;
+
+                return matchesSearch && matchesStatus && matchesAgent;
+            });
+
+            displayProperties(filtered);
+        }
+
+        function goToDashboard() {
+            window.location.href = 'Index.html';
+        }
+
+        // Load properties on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadProperties);
+        } else {
+            loadProperties();
+        }
+    </script>
+</body>
+</html>

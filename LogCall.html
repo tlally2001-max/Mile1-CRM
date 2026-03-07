@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Call - CRM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #1a2332;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+
+        .container {
+            background: #1e2d42;
+            border: 1px solid #2a3f5f;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .subtitle {
+            color: #a0aec0;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #a0aec0;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #2a3f5f;
+            border-radius: 6px;
+            background: #0f1419;
+            color: #e0e0e0;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4fa3ff;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            margin-bottom: 0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .btn-submit {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background: #16a34a;
+        }
+
+        .btn-cancel {
+            background: #2a3f5f;
+            color: #a0aec0;
+        }
+
+        .btn-cancel:hover {
+            background: #3a5f7f;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid #22c55e;
+            display: block;
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #4fa3ff;
+            margin-bottom: 20px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #2a3f5f;
+            border-top: 2px solid #4fa3ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>☎️ Log Call</h1>
+        <p class="subtitle">Record a new call interaction</p>
+
+        <div id="message" class="message"></div>
+        <div id="loading" class="loading">
+            <span class="spinner"></span>Saving...
+        </div>
+
+        <form id="callForm">
+            <div class="form-group">
+                <label for="property">Property / Company Name *</label>
+                <input type="text" id="property" name="property" required placeholder="e.g., Downtown Commons">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="dateCalled">Date Called *</label>
+                    <input type="date" id="dateCalled" name="dateCalled" required>
+                </div>
+                <div class="form-group">
+                    <label for="interactionType">Interaction Type *</label>
+                    <select id="interactionType" name="interactionType" required>
+                        <option value="">Select type</option>
+                        <option value="Spoke With">Spoke With</option>
+                        <option value="Voicemail">Voicemail</option>
+                        <option value="No Answer">No Answer</option>
+                        <option value="Wrong Number">Wrong Number</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="spokeWith">Spoke With</label>
+                <input type="text" id="spokeWith" name="spokeWith" placeholder="e.g., John Manager">
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <textarea id="notes" name="notes" placeholder="Call details, next steps, etc."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="nextFollowup">Next Follow-up Date</label>
+                <input type="date" id="nextFollowup" name="nextFollowup">
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-submit">Save Call</button>
+                <button type="button" class="btn-cancel" onclick="goBack()">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = "https://blhxgcncijmxxhleqmri.supabase.co";
+        const SUPABASE_API_KEY = "sb_publishable_T9uXncJJ9m-4fV7xDLzWPA_enkmnDHi";
+
+        // Set today's date as default
+        document.getElementById('dateCalled').valueAsDate = new Date();
+
+        // Handle form submission
+        document.getElementById('callForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await saveCall();
+        });
+
+        async function saveCall() {
+            const form = document.getElementById('callForm');
+            const messageEl = document.getElementById('message');
+            const loadingEl = document.getElementById('loading');
+
+            const callData = {
+                property_id: document.getElementById('property').value,
+                date_called: document.getElementById('dateCalled').value,
+                interaction_type: document.getElementById('interactionType').value,
+                spoke_with: document.getElementById('spokeWith').value,
+                notes: document.getElementById('notes').value,
+                next_followup_date: document.getElementById('nextFollowup').value || null
+            };
+
+            // Validate required fields
+            if (!callData.property_id || !callData.date_called || !callData.interaction_type) {
+                messageEl.className = 'message error';
+                messageEl.textContent = 'Please fill in all required fields (*)';
+                return;
+            }
+
+            loadingEl.style.display = 'block';
+            messageEl.style.display = 'none';
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/calls`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify(callData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save call: ' + response.statusText);
+                }
+
+                loadingEl.style.display = 'none';
+                messageEl.className = 'message success';
+                messageEl.textContent = '✓ Call saved successfully!';
+
+                // Clear form
+                form.reset();
+                document.getElementById('dateCalled').valueAsDate = new Date();
+
+                // Go back to dashboard after 2 seconds
+                setTimeout(() => {
+                    goBack();
+                }, 2000);
+
+            } catch (error) {
+                loadingEl.style.display = 'none';
+                messageEl.className = 'message error';
+                messageEl.textContent = 'Error: ' + error.message;
+                console.error('Error saving call:', error);
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

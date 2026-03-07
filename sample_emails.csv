@@ -1,0 +1,12 @@
+property_id,email_type,date_sent,status,notes
+P0001,Intro,2026-03-06,Responded,They replied asking for more details
+P0002,Intro,2026-03-05,No Response,Waiting for response
+P0003,Intro,2026-03-04,Responded,Forwarded to board for review
+P0003,Follow-up,2026-03-11,No Response,Sent follow-up email
+P0004,Intro,2026-03-07,Responded,Ready to proceed with IA
+P0005,Intro,2026-03-06,No Response,Initial contact
+P0006,Intro,2026-03-05,Responded,Needs more information
+P0006,Follow-up,2026-03-12,No Response,Sent follow-up details
+P0007,Intro,2026-03-03,No Response,Waiting for callback
+P0008,Intro,2026-03-07,Responded,Wants to schedule meeting
+P0010,Intro,2026-03-06,Responded,Very positive response

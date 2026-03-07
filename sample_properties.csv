@@ -1,0 +1,11 @@
+property_id,agent,property_name,address,phone_number,units,url,status
+P0001,Tom,Maple Ridge Apartments,456 Oak Street Dallas TX 75201,(214) 555-0101,156,https://example.com/maple-ridge,Contacted
+P0002,Deneane,Sunset Plaza,789 Pine Avenue Austin TX 78701,(512) 555-0202,220,https://example.com/sunset-plaza,IA Sent
+P0003,Tom,Riverside Towers,321 Elm Road Houston TX 77001,(713) 555-0303,312,https://example.com/riverside,TPV Signed
+P0004,Deneane,Downtown Commons,654 Birch Lane San Antonio TX 78201,(210) 555-0404,185,https://example.com/downtown,Installed
+P0005,Tom,Lakeside Residences,987 Willow Drive Austin TX 78702,(512) 555-0505,95,https://example.com/lakeside,Contacted
+P0006,Deneane,Central Tower,123 Main Street Houston TX 77002,(713) 555-0606,275,https://example.com/central-tower,IA Signed
+P0007,Tom,Heritage Manor,234 Heritage Lane Dallas TX 75202,(214) 555-0707,142,https://example.com/heritage-manor,TPV Sent
+P0008,Deneane,Greenwood Park,567 Green Way San Antonio TX 78202,(210) 555-0808,198,https://example.com/greenwood-park,Voicemail Left
+P0009,Tom,North Star Complex,890 North Road Fort Worth TX 76102,(817) 555-0909,165,https://example.com/north-star,No Answer
+P0010,Deneane,Parkside Gardens,111 Park Avenue Austin TX 78703,(512) 555-1010,220,https://example.com/parkside,Contacted
