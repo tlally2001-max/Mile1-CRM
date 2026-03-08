@@ -39,9 +39,9 @@
 
         .btn-back {
             padding: 10px 20px;
-            background: #2a3f5f;
-            color: #a0aec0;
-            border: none;
+            background: #f0f4f8;
+            color: #1a2332;
+            border: 1px solid #3b82f6;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
@@ -49,7 +49,7 @@
         }
 
         .btn-back:hover {
-            background: #3a5f7f;
+            background: #e0e9f4;
         }
 
         .loading {
@@ -75,8 +75,8 @@
         }
 
         .detail-card {
-            background: #1e2d42;
-            border: 1px solid #2a3f5f;
+            background: #ffffff;
+            border: 2px solid #3b82f6;
             border-radius: 10px;
             padding: 30px;
             margin-bottom: 20px;
@@ -100,7 +100,7 @@
         .property-name {
             font-size: 24px;
             font-weight: 700;
-            color: #fff;
+            color: #1a2332;
             margin-top: 5px;
         }
 
@@ -128,7 +128,7 @@
         }
 
         .info-label {
-            color: #a0aec0;
+            color: #666666;
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -137,7 +137,7 @@
         }
 
         .info-value {
-            color: #e0e0e0;
+            color: #1a2332;
             font-size: 14px;
         }
 
@@ -153,12 +153,12 @@
         .section-title {
             font-size: 16px;
             font-weight: 700;
-            color: #fff;
+            color: #1a2332;
             margin-top: 30px;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            border-bottom: 2px solid #2a3f5f;
+            border-bottom: 2px solid #3b82f6;
             padding-bottom: 10px;
         }
 
@@ -173,14 +173,15 @@
         }
 
         thead {
-            border-bottom: 2px solid #2a3f5f;
+            border-bottom: 2px solid #3b82f6;
+            background: #f0f4f8;
         }
 
         th {
             padding: 12px;
             text-align: left;
             font-weight: 600;
-            color: #a0aec0;
+            color: #1a2332;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-size: 11px;
@@ -188,18 +189,18 @@
 
         td {
             padding: 12px;
-            border-bottom: 1px solid #2a3f5f;
-            color: #e0e0e0;
+            border-bottom: 1px solid #e0e0e0;
+            color: #1a2332;
         }
 
         tbody tr:hover {
-            background: #263549;
+            background: #f9f9f9;
         }
 
         .empty-state {
             text-align: center;
             padding: 30px;
-            color: #a0aec0;
+            color: #999999;
             font-size: 13px;
         }
 
@@ -210,6 +211,175 @@
             padding: 20px;
             border-radius: 6px;
             text-align: center;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: #1e2d42;
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid #2a3f5f;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #2a3f5f;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #fff;
+            font-size: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #a0aec0;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: #fff;
+        }
+
+        .modal-field {
+            margin-bottom: 15px;
+        }
+
+        .modal-label {
+            display: block;
+            color: #a0aec0;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .modal-input, .modal-textarea {
+            width: 100%;
+            padding: 10px;
+            background: #0f1419;
+            border: 1px solid #2a3f5f;
+            color: #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .modal-input:focus, .modal-textarea:focus {
+            outline: none;
+            border-color: #4fa3ff;
+        }
+
+        .modal-textarea {
+            resize: vertical;
+            min-height: 200px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-send {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-send:hover {
+            background: #2563eb;
+        }
+
+        .btn-cancel {
+            background: #2a3f5f;
+            color: #a0aec0;
+        }
+
+        .btn-cancel:hover {
+            background: #3a5f7f;
+        }
+
+        .send-email-btn {
+            background: #3b82f6;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            margin-top: 10px;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .send-email-btn:hover {
+            background: #2563eb;
+        }
+
+        /* Override input styles for white card background */
+        .detail-card input[type="text"],
+        .detail-card input[type="email"],
+        .detail-card input[type="date"],
+        .detail-card select,
+        .detail-card textarea {
+            background: #ffffff !important;
+            border: 1px solid #3b82f6 !important;
+            color: #1a2332 !important;
+        }
+
+        .detail-card input[type="text"]:focus,
+        .detail-card input[type="email"]:focus,
+        .detail-card input[type="date"]:focus,
+        .detail-card select:focus,
+        .detail-card textarea:focus {
+            outline: none;
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .detail-card input[type="text"]::placeholder,
+        .detail-card input[type="email"]::placeholder,
+        .detail-card textarea::placeholder {
+            color: #999999;
         }
     </style>
 </head>
@@ -284,6 +454,7 @@
 
                             <div id="statusMessage" style="margin-top: 12px; padding: 8px; border-radius: 6px; text-align: center; font-size: 12px; display: none;"></div>
                         </div>
+                        <button class="send-email-btn" onclick="openEmailModal()">✉️ Send Email</button>
                     </div>
                 </div>
 
@@ -411,6 +582,43 @@
 
         <div id="error" style="display: none;">
             <div class="error" id="errorText"></div>
+        </div>
+    </div>
+
+    <!-- Email Modal -->
+    <div id="emailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✉️ Send Email</h2>
+                <button class="close-btn" onclick="closeEmailModal()">&times;</button>
+            </div>
+            <form id="emailSendForm" onsubmit="sendEmailFromForm(event)">
+                <div class="modal-field">
+                    <label class="modal-label">To (Email)</label>
+                    <input type="email" id="emailTo" class="modal-input" required placeholder="recipient@example.com">
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">To (Name)</label>
+                    <input type="text" id="emailToName" class="modal-input" required placeholder="Recipient Name">
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">Property</label>
+                    <input type="text" id="emailProperty" class="modal-input" required readonly>
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">Subject</label>
+                    <input type="text" id="emailSubject" class="modal-input" required placeholder="Email subject">
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">Message</label>
+                    <textarea id="emailBody" class="modal-textarea" required placeholder="Dear {name},&#10;&#10;...&#10;&#10;Best regards"></textarea>
+                </div>
+                <div class="modal-field" id="emailSendMessage" style="display: none; padding: 10px; border-radius: 6px; text-align: center; font-size: 12px;"></div>
+                <div class="modal-buttons">
+                    <button type="submit" class="modal-btn btn-send">Send Email</button>
+                    <button type="button" class="modal-btn btn-cancel" onclick="closeEmailModal()">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -1018,6 +1226,126 @@
                 messageEl.style.background = 'rgba(239, 68, 68, 0.2)';
                 messageEl.style.color = '#ff6b6b';
                 messageEl.textContent = '✗ Error: ' + error.message;
+            }
+        }
+
+        // Email Modal Functions
+        function openEmailModal() {
+            const modal = document.getElementById('emailModal');
+            const propertyId = getPropertyId();
+
+            // Pre-fill with property information
+            if (window.currentProperty) {
+                document.getElementById('emailProperty').value = window.currentProperty.property_name || '';
+                document.getElementById('emailTo').value = ''; // User must fill this
+                document.getElementById('emailToName').value = ''; // User must fill this
+            }
+
+            document.getElementById('emailSubject').value = 'Solar Energy Solutions';
+            document.getElementById('emailBody').value = 'Dear {name},\n\nI hope this email finds you well. We are reaching out to you regarding solar energy solutions for ' + (window.currentProperty ? window.currentProperty.property_name : 'your property') + '.\n\nPlease feel free to reach out if you have any questions.\n\nBest regards';
+
+            modal.style.display = 'block';
+        }
+
+        function closeEmailModal() {
+            const modal = document.getElementById('emailModal');
+            modal.style.display = 'none';
+            document.getElementById('emailSendForm').reset();
+            document.getElementById('emailSendMessage').style.display = 'none';
+        }
+
+        async function sendEmailFromForm(e) {
+            e.preventDefault();
+
+            const emailTo = document.getElementById('emailTo').value;
+            const emailToName = document.getElementById('emailToName').value;
+            const emailSubject = document.getElementById('emailSubject').value;
+            const emailBody = document.getElementById('emailBody').value;
+            const propertyId = getPropertyId();
+
+            const messageEl = document.getElementById('emailSendMessage');
+            messageEl.style.display = 'block';
+            messageEl.style.background = 'rgba(79, 163, 255, 0.2)';
+            messageEl.style.color = '#4fa3ff';
+            messageEl.textContent = 'Sending...';
+
+            try {
+                // Log email to Supabase first
+                const now = new Date();
+                const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+
+                const emailData = {
+                    property_id: propertyId,
+                    email_type: 'Follow-up',
+                    date_sent: today,
+                    status: 'Sent',
+                    recipient_email: emailTo,
+                    recipient_name: emailToName,
+                    subject: emailSubject,
+                    body: emailBody,
+                    notes: 'Sent from CRM interface'
+                };
+
+                // Save to Supabase
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/emails`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(emailData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to log email to database');
+                }
+
+                // Send email via Google Apps Script (if available)
+                try {
+                    if (typeof google !== 'undefined' && google.script && google.script.run) {
+                        google.script.run
+                            .withSuccessHandler(function() {
+                                messageEl.style.background = 'rgba(34, 197, 94, 0.2)';
+                                messageEl.style.color = '#22c55e';
+                                messageEl.textContent = '✓ Email sent and logged successfully!';
+                                setTimeout(() => closeEmailModal(), 2000);
+                            })
+                            .withFailureHandler(function(error) {
+                                messageEl.style.background = 'rgba(239, 68, 68, 0.2)';
+                                messageEl.style.color = '#ff6b6b';
+                                messageEl.textContent = '⚠️ Email logged but failed to send via Gmail: ' + error;
+                            })
+                            .sendEmailViaGmail(emailTo, emailToName, emailSubject, emailBody);
+                    } else {
+                        // Fallback: if not in Google Apps Script context, just log success
+                        messageEl.style.background = 'rgba(34, 197, 94, 0.2)';
+                        messageEl.style.color = '#22c55e';
+                        messageEl.textContent = '✓ Email logged successfully! (Note: Gmail integration requires Google Apps Script setup)';
+                        setTimeout(() => closeEmailModal(), 2500);
+                    }
+                } catch (gmailError) {
+                    messageEl.style.background = 'rgba(34, 197, 94, 0.2)';
+                    messageEl.style.color = '#22c55e';
+                    messageEl.textContent = '✓ Email logged successfully! (Note: Gmail integration requires Google Apps Script setup)';
+                    setTimeout(() => closeEmailModal(), 2500);
+                }
+
+                // Reload property details to show updated email list
+                setTimeout(() => loadPropertyDetails(), 3000);
+
+            } catch (error) {
+                messageEl.style.background = 'rgba(239, 68, 68, 0.2)';
+                messageEl.style.color = '#ff6b6b';
+                messageEl.textContent = '✗ Error: ' + error.message;
+                console.error('Error sending email:', error);
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('emailModal');
+            if (event.target === modal) {
+                closeEmailModal();
             }
         }
 
