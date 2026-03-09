@@ -344,20 +344,12 @@
                 <strong>Rows:</strong> <span id="rowCount"></span>
             </div>
 
-            <div id="columnMapping"></div>
-
-            <table class="preview-table" id="previewTable">
-                <thead id="previewHead"></thead>
-                <tbody id="previewBody"></tbody>
-            </table>
-
             <div class="progress-bar" id="progressBar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
 
-            <div class="button-group" id="buttonGroup" style="display: none;">
+            <div class="button-group" id="buttonGroup" style="display: none; margin-top: 20px;">
                 <button type="button" class="btn-submit" onclick="uploadData()">Upload Data</button>
-                <button type="button" class="btn-cancel" onclick="resetForm()">Cancel</button>
             </div>
         </div>
     </div>
@@ -452,69 +444,14 @@
             document.getElementById('fileName').textContent = fileName;
             document.getElementById('rowCount').textContent = uploadedData.length;
 
-            updateColumnMapping();
-            showPreview();
+            // Auto-map columns by name (fixed format)
+            autoMapColumns();
             document.getElementById('buttonGroup').style.display = 'flex';
         }
 
-        function updateColumnMapping() {
-            const table = 'properties';
-            const schema = tableSchemas[table];
-            const mapping = document.getElementById('columnMapping');
-            mapping.innerHTML = '<h3 style="color: #FFFFFF; margin-top: 20px; margin-bottom: 15px;">Column Mapping</h3>';
-
-            schema.forEach(dbColumn => {
-                const div = document.createElement('div');
-                div.style.marginBottom = '15px';
-                const label = document.createElement('label');
-                label.textContent = 'Map to: ' + dbColumn;
-                const select = document.createElement('select');
-                select.id = 'map_' + dbColumn;
-                select.style.marginTop = '5px';
-
-                const option = document.createElement('option');
-                option.value = '';
-                option.textContent = '-- Skip this field --';
-                select.appendChild(option);
-
-                fileColumns.forEach(col => {
-                    const opt = document.createElement('option');
-                    opt.value = col;
-                    opt.textContent = col;
-                    select.appendChild(opt);
-                });
-
-                div.appendChild(label);
-                div.appendChild(select);
-                mapping.appendChild(div);
-            });
-        }
-
-        function showPreview() {
-            const previewTable = document.getElementById('previewTable');
-            const previewHead = document.getElementById('previewHead');
-            const previewBody = document.getElementById('previewBody');
-
-            previewHead.innerHTML = '';
-            previewBody.innerHTML = '';
-
-            fileColumns.forEach(col => {
-                const th = document.createElement('th');
-                th.textContent = col;
-                previewHead.appendChild(th);
-            });
-
-            uploadedData.slice(0, 5).forEach(row => {
-                const tr = document.createElement('tr');
-                row.forEach(cell => {
-                    const td = document.createElement('td');
-                    td.textContent = cell || '-';
-                    tr.appendChild(td);
-                });
-                previewBody.appendChild(tr);
-            });
-
-            previewTable.classList.add('show');
+        function autoMapColumns() {
+            // Auto-map columns: property_name, address, url are required
+            // This assumes the file has the correct column names
         }
 
         // Auto-generate column mapping on file load
@@ -525,34 +462,15 @@
         async function uploadData() {
             const table = 'properties';
 
-            const schema = tableSchemas[table];
-            const mapping = {};
-            let hasMapping = false;
-
-            schema.forEach(dbColumn => {
-                const select = document.getElementById('map_' + dbColumn);
-                if (select.value) {
-                    mapping[dbColumn] = select.value;
-                    hasMapping = true;
-                }
-            });
-
-            if (!hasMapping) {
-                showMessage('Please map at least one column', 'error');
-                return;
-            }
-
             document.getElementById('loading').style.display = 'block';
             document.getElementById('progressBar').classList.add('show');
             const progressFill = document.getElementById('progressFill');
 
+            // Transform data using file column names directly
             const transformedData = uploadedData.map(row => {
                 const obj = {};
-                Object.entries(mapping).forEach(([dbCol, fileCol]) => {
-                    const idx = fileColumns.indexOf(fileCol);
-                    if (idx >= 0) {
-                        obj[dbCol] = row[idx] || null;
-                    }
+                fileColumns.forEach((col, idx) => {
+                    obj[col] = row[idx] || null;
                 });
                 return obj;
             });
@@ -598,8 +516,6 @@
             uploadedData = [];
             fileColumns = [];
             document.getElementById('fileInfo').classList.remove('show');
-            document.getElementById('columnMapping').innerHTML = '';
-            document.getElementById('previewTable').classList.remove('show');
             document.getElementById('buttonGroup').style.display = 'none';
             document.getElementById('progressBar').classList.remove('show');
             document.getElementById('progressFill').style.width = '0%';
