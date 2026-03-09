@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload File - CRM</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.4.1/papaparse.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #5D9CEC;
+            min-height: 100vh;
+            padding: 20px;
+            color: #FFFFFF;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .btn-back {
+            padding: 10px 20px;
+            background: #F39C12;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: #d4890e;
+        }
+
+        .card {
+            background: #2D3E50;
+            border: none;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .upload-area {
+            border: 2px dashed #3a5268;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(26, 37, 53, 0.5);
+        }
+
+        .upload-area:hover {
+            border-color: #F39C12;
+            background: rgba(243, 156, 18, 0.1);
+        }
+
+        .upload-area.dragover {
+            border-color: #F39C12;
+            background: rgba(243, 156, 18, 0.2);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+        }
+
+        .upload-subtext {
+            font-size: 14px;
+            color: #ABB2B9;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(243, 156, 18, 0.1);
+            border: 1px solid #F39C12;
+            border-radius: 8px;
+            color: #ABB2B9;
+            display: none;
+        }
+
+        .file-info.show {
+            display: block;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #ABB2B9;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 20px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #3a5268;
+            border-radius: 6px;
+            background: #1a2535;
+            color: #FFFFFF;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .preview-table.show {
+            display: table;
+        }
+
+        .preview-table thead {
+            background: #1a2535;
+            border-bottom: 2px solid #3a5268;
+        }
+
+        .preview-table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #ABB2B9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 11px;
+        }
+
+        .preview-table td {
+            padding: 12px;
+            border-bottom: 1px solid #3a5268;
+            color: #FFFFFF;
+        }
+
+        .preview-table tbody tr:hover {
+            background: #3a4f63;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 24px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .btn-submit {
+            background: #F39C12;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background: #d4890e;
+        }
+
+        .btn-submit:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .btn-cancel {
+            background: #3a5268;
+            color: #ABB2B9;
+        }
+
+        .btn-cancel:hover {
+            background: #4a6278;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border: 1px solid #2ecc71;
+            display: block;
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #F39C12;
+            margin-bottom: 20px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #3a5268;
+            border-top: 2px solid #F39C12;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #1a2535;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar.show {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #F39C12;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📤 Upload File</h1>
+            <button class="btn-back" onclick="window.location.href='Index.html'">← Back to Dashboard</button>
+        </div>
+
+        <div class="card">
+            <div id="message" class="message"></div>
+            <div id="loading" class="loading">
+                <span class="spinner"></span>Processing...
+            </div>
+
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Click to upload or drag and drop</div>
+                <div class="upload-subtext">Excel (.xlsx, .xls) or CSV (.csv) files</div>
+            </div>
+
+            <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
+
+            <div class="file-info" id="fileInfo">
+                <strong>File:</strong> <span id="fileName"></span><br>
+                <strong>Rows:</strong> <span id="rowCount"></span>
+            </div>
+
+            <label for="tableSelect">Select Target Table *</label>
+            <select id="tableSelect" required>
+                <option value="">-- Select a table --</option>
+                <option value="properties">Properties</option>
+                <option value="calls">Calls</option>
+                <option value="emails">Emails</option>
+                <option value="documents">Documents</option>
+                <option value="installations">Installations</option>
+            </select>
+
+            <div id="columnMapping"></div>
+
+            <table class="preview-table" id="previewTable">
+                <thead id="previewHead"></thead>
+                <tbody id="previewBody"></tbody>
+            </table>
+
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="button-group" id="buttonGroup" style="display: none;">
+                <button type="button" class="btn-submit" onclick="uploadData()">Upload Data</button>
+                <button type="button" class="btn-cancel" onclick="resetForm()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://blhxgcncijmxxhleqmri.supabase.co";
+        const SUPABASE_API_KEY = "sb_publishable_T9uXncJJ9m-4fV7xDLzWPA_enkmnDHi";
+
+        let uploadedData = [];
+        let fileColumns = [];
+        const tableSchemas = {
+            properties: ['property_id', 'property_name', 'address', 'phone_number', 'units', 'agent', 'status', 'url'],
+            calls: ['property_id', 'date_called', 'interaction_type', 'spoke_with', 'notes', 'next_followup_date'],
+            emails: ['property_id', 'email_type', 'date_sent', 'status', 'notes'],
+            documents: ['property_id', 'document_type', 'date_uploaded', 'status'],
+            installations: ['property_id', 'installation_date', 'payment_status', 'paid_amount']
+        };
+
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFile(e.dataTransfer.files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            const messageEl = document.getElementById('message');
+            messageEl.style.display = 'none';
+
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    let data = [];
+                    const ext = file.name.split('.').pop().toLowerCase();
+
+                    if (ext === 'csv') {
+                        Papa.parse(file, {
+                            complete: (results) => {
+                                data = results.data.filter(row => row.some(cell => cell));
+                                processData(data, file.name);
+                            },
+                            error: (error) => {
+                                showMessage('Error parsing CSV: ' + error.message, 'error');
+                            }
+                        });
+                    } else {
+                        const workbook = XLSX.read(e.target.result, { type: 'binary' });
+                        const sheetName = workbook.SheetNames[0];
+                        data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+                        processData(data, file.name);
+                    }
+                } catch (error) {
+                    showMessage('Error reading file: ' + error.message, 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function processData(data, fileName) {
+            if (data.length < 2) {
+                showMessage('File must contain at least headers and one data row', 'error');
+                return;
+            }
+
+            fileColumns = data[0];
+            uploadedData = data.slice(1);
+
+            document.getElementById('fileInfo').classList.add('show');
+            document.getElementById('fileName').textContent = fileName;
+            document.getElementById('rowCount').textContent = uploadedData.length;
+
+            updateColumnMapping();
+            showPreview();
+            document.getElementById('buttonGroup').style.display = 'flex';
+        }
+
+        function updateColumnMapping() {
+            const table = document.getElementById('tableSelect').value;
+            if (!table) return;
+
+            const schema = tableSchemas[table];
+            const mapping = document.getElementById('columnMapping');
+            mapping.innerHTML = '<h3 style="color: #FFFFFF; margin-top: 20px; margin-bottom: 15px;">Column Mapping</h3>';
+
+            schema.forEach(dbColumn => {
+                const div = document.createElement('div');
+                div.style.marginBottom = '15px';
+                const label = document.createElement('label');
+                label.textContent = 'Map to: ' + dbColumn;
+                const select = document.createElement('select');
+                select.id = 'map_' + dbColumn;
+                select.style.marginTop = '5px';
+
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = '-- Skip this field --';
+                select.appendChild(option);
+
+                fileColumns.forEach(col => {
+                    const opt = document.createElement('option');
+                    opt.value = col;
+                    opt.textContent = col;
+                    select.appendChild(opt);
+                });
+
+                div.appendChild(label);
+                div.appendChild(select);
+                mapping.appendChild(div);
+            });
+        }
+
+        function showPreview() {
+            const previewTable = document.getElementById('previewTable');
+            const previewHead = document.getElementById('previewHead');
+            const previewBody = document.getElementById('previewBody');
+
+            previewHead.innerHTML = '';
+            previewBody.innerHTML = '';
+
+            fileColumns.forEach(col => {
+                const th = document.createElement('th');
+                th.textContent = col;
+                previewHead.appendChild(th);
+            });
+
+            uploadedData.slice(0, 5).forEach(row => {
+                const tr = document.createElement('tr');
+                row.forEach(cell => {
+                    const td = document.createElement('td');
+                    td.textContent = cell || '-';
+                    tr.appendChild(td);
+                });
+                previewBody.appendChild(tr);
+            });
+
+            previewTable.classList.add('show');
+        }
+
+        document.getElementById('tableSelect').addEventListener('change', updateColumnMapping);
+
+        async function uploadData() {
+            const table = document.getElementById('tableSelect').value;
+            if (!table) {
+                showMessage('Please select a table', 'error');
+                return;
+            }
+
+            const schema = tableSchemas[table];
+            const mapping = {};
+            let hasMapping = false;
+
+            schema.forEach(dbColumn => {
+                const select = document.getElementById('map_' + dbColumn);
+                if (select.value) {
+                    mapping[dbColumn] = select.value;
+                    hasMapping = true;
+                }
+            });
+
+            if (!hasMapping) {
+                showMessage('Please map at least one column', 'error');
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('progressBar').classList.add('show');
+            const progressFill = document.getElementById('progressFill');
+
+            const transformedData = uploadedData.map(row => {
+                const obj = {};
+                Object.entries(mapping).forEach(([dbCol, fileCol]) => {
+                    const idx = fileColumns.indexOf(fileCol);
+                    if (idx >= 0) {
+                        obj[dbCol] = row[idx] || null;
+                    }
+                });
+                return obj;
+            });
+
+            try {
+                const batchSize = 100;
+                for (let i = 0; i < transformedData.length; i += batchSize) {
+                    const batch = transformedData.slice(i, i + batchSize);
+
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=representation'
+                        },
+                        body: JSON.stringify(batch)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Failed to upload batch: ${response.statusText}`);
+                    }
+
+                    const progress = ((i + batch.length) / transformedData.length) * 100;
+                    progressFill.style.width = progress + '%';
+                }
+
+                document.getElementById('loading').style.display = 'none';
+                showMessage(`✓ Successfully uploaded ${transformedData.length} records!`, 'success');
+                setTimeout(() => {
+                    window.location.href = 'Index.html';
+                }, 2000);
+
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                showMessage('Error: ' + error.message, 'error');
+                console.error('Upload error:', error);
+            }
+        }
+
+        function resetForm() {
+            fileInput.value = '';
+            uploadedData = [];
+            fileColumns = [];
+            document.getElementById('fileInfo').classList.remove('show');
+            document.getElementById('columnMapping').innerHTML = '';
+            document.getElementById('previewTable').classList.remove('show');
+            document.getElementById('buttonGroup').style.display = 'none';
+            document.getElementById('progressBar').classList.remove('show');
+            document.getElementById('progressFill').style.width = '0%';
+        }
+
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.className = 'message ' + type;
+            messageEl.textContent = text;
+            messageEl.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
