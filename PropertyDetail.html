@@ -1366,9 +1366,9 @@
             const callDate = document.getElementById('callDate').value;
             const interactionType = document.getElementById('interactionType').value;
 
-            // Auto-set follow-up date to 7 days for voicemail/no answer
+            // Auto-set follow-up date to 7 days
             let nextFollowupDate = document.getElementById('nextFollowup').value || null;
-            if (!nextFollowupDate && (interactionType === 'Voicemail Left' || interactionType === 'Voicemail' || interactionType === 'No Answer')) {
+            if (!nextFollowupDate) {
                 const followupDateObj = new Date(callDate);
                 followupDateObj.setDate(followupDateObj.getDate() + 7);
                 const year = followupDateObj.getFullYear();
