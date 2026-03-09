@@ -1355,6 +1355,40 @@
 
                 if (!response.ok) throw new Error('Failed to save call');
 
+                // Update property status based on interaction type
+                const interactionType = document.getElementById('interactionType').value;
+                if (interactionType === 'Spoke With') {
+                    const propResponse = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ status: 'Contacted' })
+                    });
+                    if (!propResponse.ok) throw new Error('Failed to update property status');
+                } else if (interactionType === 'Voicemail Left' || interactionType === 'Voicemail') {
+                    const propResponse = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ status: 'Voicemail Left' })
+                    });
+                    if (!propResponse.ok) throw new Error('Failed to update property status');
+                } else if (interactionType === 'No Answer') {
+                    const propResponse = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ status: 'No Answer' })
+                    });
+                    if (!propResponse.ok) throw new Error('Failed to update property status');
+                }
+
                 // Show success message
                 const messageEl = document.getElementById('callMessage');
                 messageEl.style.display = 'block';
