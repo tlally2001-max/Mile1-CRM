@@ -187,15 +187,9 @@
         </div>
 
         <form id="propertyForm">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="propertyId">Property ID *</label>
-                    <input type="text" id="propertyId" name="propertyId" required placeholder="e.g., P0001">
-                </div>
-                <div class="form-group">
-                    <label for="propertyName">Property Name *</label>
-                    <input type="text" id="propertyName" name="propertyName" required placeholder="e.g., Downtown Commons">
-                </div>
+            <div class="form-group">
+                <label for="propertyName">Property Name *</label>
+                <input type="text" id="propertyName" name="propertyName" required placeholder="e.g., Downtown Commons">
             </div>
 
             <div class="form-group">
@@ -217,7 +211,11 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="agent">Agent *</label>
-                    <input type="text" id="agent" name="agent" required placeholder="Agent name">
+                    <select id="agent" name="agent" required>
+                        <option value="">Select agent</option>
+                        <option value="Tom">Tom</option>
+                        <option value="Deneane">Deneane</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="status">Status *</label>
@@ -268,7 +266,6 @@
             const loadingEl = document.getElementById('loading');
 
             const propertyData = {
-                property_id: document.getElementById('propertyId').value,
                 property_name: document.getElementById('propertyName').value,
                 address: document.getElementById('address').value,
                 phone_number: document.getElementById('phone').value,
@@ -280,7 +277,7 @@
             };
 
             // Validate required fields
-            if (!propertyData.property_id || !propertyData.property_name || !propertyData.address ||
+            if (!propertyData.property_name || !propertyData.address ||
                 !propertyData.phone_number || !propertyData.units || !propertyData.agent || !propertyData.status) {
                 messageEl.className = 'message error';
                 messageEl.textContent = 'Please fill in all required fields (*)';
