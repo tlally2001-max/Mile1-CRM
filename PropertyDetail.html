@@ -1051,7 +1051,7 @@
                     if (!response.ok) throw new Error('Failed to update IA document');
                 }
                 showStatusMessage('IA Status updated!');
-                setTimeout(() => loadPropertyDetails(), 1500);
+                setTimeout(() => loadPropertyDetails(), 1000);
             } catch (error) {
                 showStatusMessage('Error: ' + error.message, true);
             }
