@@ -411,7 +411,7 @@
                         </div>
                         <div class="info-item" style="margin-top: 12px;">
                             <div class="info-label">Phone</div>
-                            <div class="info-value" id="phone"></div>
+                            <input type="tel" id="phoneInput" style="width: 100%; padding: 8px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px; font-size: 14px; margin-top: 5px;">
                         </div>
                     </div>
                     <div>
@@ -461,13 +461,23 @@
                 <div class="info-grid">
                     <div class="info-item">
                         <div class="info-label">Units</div>
-                        <div class="info-value" id="units"></div>
+                        <input type="number" id="unitsInput" style="width: 100%; padding: 8px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px; font-size: 14px; margin-top: 5px;">
                     </div>
                     <div class="info-item">
                         <div class="info-label">Agent</div>
-                        <div class="info-value" id="agent"></div>
+                        <select id="agentSelect" style="width: 100%; padding: 8px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px; font-size: 14px; margin-top: 5px;">
+                            <option value="Unassigned">Unassigned</option>
+                            <option value="Tom">Tom</option>
+                            <option value="Deneane">Deneane</option>
+                        </select>
                     </div>
                 </div>
+
+                <div style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button type="button" onclick="updatePropertyDetails()" style="flex: 1; padding: 10px 20px; background: #F39C12; color: white; border: none; border-radius: 24px; cursor: pointer; font-weight: 600; font-size: 14px;">💾 Update</button>
+                </div>
+
+                <div id="propertyUpdateMessage" style="margin-top: 12px; padding: 8px; border-radius: 6px; text-align: center; font-size: 12px; display: none;"></div>
             </div>
 
             <!-- Log Call Form -->
@@ -710,13 +720,60 @@
             }
         }
 
+        async function updatePropertyDetails() {
+            const propertyId = getPropertyId();
+            const messageEl = document.getElementById('propertyUpdateMessage');
+
+            const updateData = {
+                phone_number: document.getElementById('phoneInput').value || null,
+                units: document.getElementById('unitsInput').value ? parseInt(document.getElementById('unitsInput').value) : null,
+                agent: document.getElementById('agentSelect').value || 'Unassigned'
+            };
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update property: ' + response.statusText);
+                }
+
+                messageEl.className = 'success';
+                messageEl.style.background = 'rgba(46, 204, 113, 0.2)';
+                messageEl.style.color = '#2ecc71';
+                messageEl.style.border = '1px solid #2ecc71';
+                messageEl.textContent = '✓ Property updated successfully!';
+                messageEl.style.display = 'block';
+
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, 3000);
+
+            } catch (error) {
+                messageEl.className = 'error';
+                messageEl.style.background = 'rgba(239, 68, 68, 0.2)';
+                messageEl.style.color = '#ff6b6b';
+                messageEl.style.border = '1px solid #ff6b6b';
+                messageEl.textContent = 'Error: ' + error.message;
+                messageEl.style.display = 'block';
+                console.error('Update error:', error);
+            }
+        }
+
         function displayProperty(property) {
             document.getElementById('propertyId').textContent = property.property_id || 'N/A';
             document.getElementById('propertyName').textContent = property.property_name || 'Unknown';
             document.getElementById('address').textContent = property.address || 'N/A';
-            document.getElementById('phone').textContent = property.phone_number || 'N/A';
-            document.getElementById('units').textContent = property.units || 'N/A';
-            document.getElementById('agent').textContent = property.agent || 'N/A';
+            document.getElementById('phoneInput').value = property.phone_number || '';
+            document.getElementById('unitsInput').value = property.units || '';
+            document.getElementById('agentSelect').value = property.agent || 'Unassigned';
             document.getElementById('status').textContent = property.status || 'New';
 
             if (property.url) {
