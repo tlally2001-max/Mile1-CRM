@@ -1068,7 +1068,8 @@
                     method: 'PATCH',
                     headers: {
                         'apikey': SUPABASE_API_KEY,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
                     },
                     body: JSON.stringify({ status: propertyStatus })
                 });
@@ -1140,7 +1141,8 @@
                     method: 'PATCH',
                     headers: {
                         'apikey': SUPABASE_API_KEY,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
                     },
                     body: JSON.stringify({ status: propertyStatus })
                 });
@@ -1405,7 +1407,8 @@
                         method: 'PATCH',
                         headers: {
                             'apikey': SUPABASE_API_KEY,
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=representation'
                         },
                         body: JSON.stringify({ status: 'Contacted' })
                     });
@@ -1415,7 +1418,8 @@
                         method: 'PATCH',
                         headers: {
                             'apikey': SUPABASE_API_KEY,
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=representation'
                         },
                         body: JSON.stringify({ status: 'Voicemail Left' })
                     });
@@ -1425,7 +1429,8 @@
                         method: 'PATCH',
                         headers: {
                             'apikey': SUPABASE_API_KEY,
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=representation'
                         },
                         body: JSON.stringify({ status: 'No Answer' })
                     });
