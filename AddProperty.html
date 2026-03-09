@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Property - CRM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #5D9CEC;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #FFFFFF;
+        }
+
+        .container {
+            background: #2D3E50;
+            border: none;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #FFFFFF;
+        }
+
+        .subtitle {
+            color: #ABB2B9;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #ABB2B9;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #3a5268;
+            border-radius: 6px;
+            background: #1a2535;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #F39C12;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 24px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .btn-submit {
+            background: #F39C12;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background: #d4890e;
+        }
+
+        .btn-cancel {
+            background: #3a5268;
+            color: #ABB2B9;
+        }
+
+        .btn-cancel:hover {
+            background: #4a6278;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border: 1px solid #2ecc71;
+            display: block;
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #F39C12;
+            margin-bottom: 20px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #3a5268;
+            border-top: 2px solid #F39C12;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>➕ Add Property</h1>
+        <p class="subtitle">Add a new property to the CRM</p>
+
+        <div id="message" class="message"></div>
+        <div id="loading" class="loading">
+            <span class="spinner"></span>Saving...
+        </div>
+
+        <form id="propertyForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="propertyId">Property ID *</label>
+                    <input type="text" id="propertyId" name="propertyId" required placeholder="e.g., P0001">
+                </div>
+                <div class="form-group">
+                    <label for="propertyName">Property Name *</label>
+                    <input type="text" id="propertyName" name="propertyName" required placeholder="e.g., Downtown Commons">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="address">Address *</label>
+                <input type="text" id="address" name="address" required placeholder="Street address">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="(555) 123-4567">
+                </div>
+                <div class="form-group">
+                    <label for="units">Number of Units *</label>
+                    <input type="number" id="units" name="units" required placeholder="e.g., 100">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="agent">Agent *</label>
+                    <input type="text" id="agent" name="agent" required placeholder="Agent name">
+                </div>
+                <div class="form-group">
+                    <label for="status">Status *</label>
+                    <select id="status" name="status" required>
+                        <option value="">Select status</option>
+                        <option value="New">New</option>
+                        <option value="Contacted">Contacted</option>
+                        <option value="IA Sent">IA Sent</option>
+                        <option value="IA Signed">IA Signed</option>
+                        <option value="TPV Sent">TPV Sent</option>
+                        <option value="TPV Signed">TPV Signed</option>
+                        <option value="Installed">Installed</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="url">Website URL</label>
+                <input type="url" id="url" name="url" placeholder="https://example.com">
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <textarea id="notes" name="notes" placeholder="Additional property details..."></textarea>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-submit">Add Property</button>
+                <button type="button" class="btn-cancel" onclick="goBack()">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = "https://blhxgcncijmxxhleqmri.supabase.co";
+        const SUPABASE_API_KEY = "sb_publishable_T9uXncJJ9m-4fV7xDLzWPA_enkmnDHi";
+
+        // Handle form submission
+        document.getElementById('propertyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await saveProperty();
+        });
+
+        async function saveProperty() {
+            const form = document.getElementById('propertyForm');
+            const messageEl = document.getElementById('message');
+            const loadingEl = document.getElementById('loading');
+
+            const propertyData = {
+                property_id: document.getElementById('propertyId').value,
+                property_name: document.getElementById('propertyName').value,
+                address: document.getElementById('address').value,
+                phone_number: document.getElementById('phone').value,
+                units: parseInt(document.getElementById('units').value),
+                agent: document.getElementById('agent').value,
+                status: document.getElementById('status').value,
+                url: document.getElementById('url').value || null,
+                notes: document.getElementById('notes').value || null
+            };
+
+            // Validate required fields
+            if (!propertyData.property_id || !propertyData.property_name || !propertyData.address ||
+                !propertyData.phone_number || !propertyData.units || !propertyData.agent || !propertyData.status) {
+                messageEl.className = 'message error';
+                messageEl.textContent = 'Please fill in all required fields (*)';
+                return;
+            }
+
+            loadingEl.style.display = 'block';
+            messageEl.style.display = 'none';
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/properties`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify(propertyData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save property: ' + response.statusText);
+                }
+
+                loadingEl.style.display = 'none';
+                messageEl.className = 'message success';
+                messageEl.textContent = '✓ Property added successfully!';
+
+                // Clear form
+                form.reset();
+
+                // Go back to dashboard after 2 seconds
+                setTimeout(() => {
+                    goBack();
+                }, 2000);
+
+            } catch (error) {
+                loadingEl.style.display = 'none';
+                messageEl.className = 'message error';
+                messageEl.textContent = 'Error: ' + error.message;
+                console.error('Error saving property:', error);
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'Index.html';
+        }
+    </script>
+</body>
+</html>
