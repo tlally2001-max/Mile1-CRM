@@ -170,6 +170,22 @@
             vertical-align: middle;
         }
 
+        .btn-back {
+            padding: 10px 20px;
+            background: #F39C12;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-back:hover {
+            background: #d4890e;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -178,7 +194,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>➕ Add Property</h1>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1>➕ Add Property</h1>
+            <button class="btn-back" onclick="window.location.href='Index.html'">← Back to Dashboard</button>
+        </div>
         <p class="subtitle">Add a new property to the CRM</p>
 
         <div id="message" class="message"></div>
