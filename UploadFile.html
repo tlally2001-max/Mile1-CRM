@@ -302,6 +302,17 @@
                 <span class="spinner"></span>Processing...
             </div>
 
+            <div style="margin-bottom: 20px; padding: 15px; background: rgba(243, 156, 18, 0.1); border: 1px solid #F39C12; border-radius: 12px;">
+                <div style="color: #F39C12; font-weight: 600; margin-bottom: 10px;">📊 Import from Google Sheets</div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="googleSheetUrl" placeholder="Paste Google Sheets URL here..." style="flex: 1; padding: 10px; border: 1px solid #3a5268; border-radius: 6px; background: #1a2535; color: #FFFFFF; font-size: 14px;">
+                    <button type="button" onclick="uploadFromGoogleSheets()" style="padding: 10px 20px; background: #F39C12; color: white; border: none; border-radius: 24px; cursor: pointer; font-weight: 600; font-size: 14px;">📤 Load Sheet</button>
+                </div>
+                <div style="color: #ABB2B9; font-size: 11px; margin-top: 8px;">
+                    <strong>Note:</strong> Make sure the Google Sheet is shared publicly (Anyone with link can view)
+                </div>
+            </div>
+
             <div class="upload-area" id="uploadArea">
                 <div class="upload-icon">📁</div>
                 <div class="upload-text">Click to upload or drag and drop</div>
@@ -391,6 +402,52 @@
                 handleFile(e.target.files[0]);
             }
         });
+
+        async function uploadFromGoogleSheets() {
+            const url = document.getElementById('googleSheetUrl').value.trim();
+            if (!url) {
+                showMessage('Please paste a Google Sheets URL', 'error');
+                return;
+            }
+
+            try {
+                // Extract sheet ID from the URL
+                const sheetIdMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+                if (!sheetIdMatch) {
+                    showMessage('Invalid Google Sheets URL. Make sure to paste the full sharing link.', 'error');
+                    return;
+                }
+
+                const sheetId = sheetIdMatch[1];
+                const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+
+                // Fetch the CSV data
+                const response = await fetch(csvUrl);
+                if (!response.ok) {
+                    throw new Error('Could not access the sheet. Make sure it is shared publicly (Anyone with link can view).');
+                }
+
+                const csvText = await response.text();
+
+                // Parse CSV using Papa Parse
+                Papa.parse(csvText, {
+                    complete: (results) => {
+                        const data = results.data.filter(row => row.some(cell => cell));
+                        if (data.length < 2) {
+                            showMessage('Sheet must contain headers and at least one data row', 'error');
+                            return;
+                        }
+                        processData(data, 'Google Sheet');
+                    },
+                    error: (error) => {
+                        showMessage('Error parsing sheet: ' + error.message, 'error');
+                    }
+                });
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+                console.error('Google Sheets error:', error);
+            }
+        }
 
         function handleFile(file) {
             const messageEl = document.getElementById('message');
