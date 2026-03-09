@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload File - CRM</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.4.1/papaparse.min.js"></script>
     <style>
         * {
@@ -399,6 +399,10 @@
                             }
                         });
                     } else {
+                        if (typeof XLSX === 'undefined') {
+                            showMessage('Excel library not loaded. Please try again.', 'error');
+                            return;
+                        }
                         const workbook = XLSX.read(e.target.result, { type: 'binary' });
                         const sheetName = workbook.SheetNames[0];
                         data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
