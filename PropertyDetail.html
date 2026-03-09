@@ -429,7 +429,10 @@
                     </div>
                     <div>
                         <div style="border-bottom: 1px solid #2a3f5f; padding-bottom: 15px;">
-                            <div class="info-label" style="margin-bottom: 15px;">Status Tracking</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <div class="info-label">Status Tracking</div>
+                                <button type="button" onclick="markPropertyAsNo()" style="padding: 6px 16px; background: #ef4444; color: white; border: none; border-radius: 16px; cursor: pointer; font-weight: 600; font-size: 12px; transition: all 0.3s;">❌ NO</button>
+                            </div>
 
                             <div class="info-item" style="margin-bottom: 12px;">
                                 <div class="info-label">IA Status</div>
@@ -1173,6 +1176,32 @@
                     if (!response.ok) throw new Error('Failed to update paid status');
                 }
                 showStatusMessage('Paid status updated!');
+                setTimeout(() => loadPropertyDetails(), 1500);
+            } catch (error) {
+                showStatusMessage('Error: ' + error.message, true);
+            }
+        }
+
+        async function markPropertyAsNo() {
+            const propertyId = getPropertyId();
+            if (!confirm('Mark this property as "NO" - it will not count in pipeline. Continue?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: 'No Access'
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to mark property as NO');
+                showStatusMessage('Property marked as NO - removed from pipeline!');
                 setTimeout(() => loadPropertyDetails(), 1500);
             } catch (error) {
                 showStatusMessage('Error: ' + error.message, true);
