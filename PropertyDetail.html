@@ -733,39 +733,20 @@
             const propertyId = getPropertyId();
             const messageEl = document.getElementById('propertyUpdateMessage');
 
-            const updateData = {
-                phone_number: document.getElementById('phoneInput').value || null,
-                units: document.getElementById('unitsInput').value ? parseInt(document.getElementById('unitsInput').value) : null,
-                agent: document.getElementById('agentSelect').value || 'Unassigned'
-            };
-
-            // Handle property manager - create or update
+            // Get all field values
+            const phoneValue = document.getElementById('phoneInput').value;
+            const unitsValue = document.getElementById('unitsInput').value;
+            const agentValue = document.getElementById('agentSelect').value;
             const pmFirstName = document.getElementById('propertyManagerFirstName').value;
             const pmLastName = document.getElementById('propertyManagerLastName').value;
 
-            if (pmFirstName || pmLastName) {
-                try {
-                    // First, check if property manager exists for this property
-                    const existingPM = await fetch(`${SUPABASE_URL}/rest/v1/property_managers?select=id&property_id=eq.${propertyId}`, {
-                        method: 'GET',
-                        headers: {
-                            'apikey': SUPABASE_API_KEY,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    const pmData = {
-                        first_name: pmFirstName || null,
-                        last_name: pmLastName || null
-                    };
-
-                    // For now, just store the first and last name in the property
-                    updateData.property_manager_first_name = pmFirstName || null;
-                    updateData.property_manager_last_name = pmLastName || null;
-                } catch (error) {
-                    console.error('Error handling property manager:', error);
-                }
-            }
+            const updateData = {
+                phone_number: phoneValue ? phoneValue : null,
+                units: unitsValue ? parseInt(unitsValue) : null,
+                agent: agentValue || 'Unassigned',
+                property_manager_first_name: pmFirstName ? pmFirstName : null,
+                property_manager_last_name: pmLastName ? pmLastName : null
+            };
 
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
