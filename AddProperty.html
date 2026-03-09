@@ -325,6 +325,29 @@
                 return;
             }
 
+            // Check for duplicate address
+            try {
+                const checkResponse = await fetch(`${SUPABASE_URL}/rest/v1/properties?address=eq.${encodeURIComponent(propertyData.address)}&select=property_id`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (checkResponse.ok) {
+                    const existingRecords = await checkResponse.json();
+                    if (existingRecords.length > 0) {
+                        messageEl.className = 'message error';
+                        messageEl.textContent = '⚠️ A property with this address already exists (' + existingRecords[0].property_id + '). Cannot add duplicate.';
+                        messageEl.style.display = 'block';
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking for duplicates:', error);
+            }
+
             loadingEl.style.display = 'block';
             messageEl.style.display = 'none';
 

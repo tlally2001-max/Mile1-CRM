@@ -566,8 +566,19 @@
                     }
                 }
 
+                // Fetch all existing addresses to check for duplicates
+                const existingAddressesResp = await fetch(`${SUPABASE_URL}/rest/v1/properties?select=address`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const existingAddresses = existingAddressesResp.ok ? (await existingAddressesResp.json()).map(p => p.address) : [];
+
                 // Transform data using file column names directly and generate sequential property IDs
-                const transformedData = uploadedData.map((row, idx) => {
+                let transformedData = uploadedData.map((row, idx) => {
                     const obj = {};
                     fileColumns.forEach((col, colIdx) => {
                         obj[col] = row[colIdx] || null;
@@ -578,6 +589,26 @@
                     }
                     return obj;
                 });
+
+                // Filter out records with duplicate addresses
+                const duplicateAddresses = [];
+                transformedData = transformedData.filter(record => {
+                    if (existingAddresses.includes(record.address)) {
+                        duplicateAddresses.push(record.address);
+                        return false;
+                    }
+                    return true;
+                });
+
+                if (duplicateAddresses.length > 0) {
+                    showMessage(`⚠️ Skipped ${duplicateAddresses.length} duplicate address(es). Uploading ${transformedData.length} new records.`, 'success');
+                }
+
+                if (transformedData.length === 0) {
+                    document.getElementById('loading').style.display = 'none';
+                    showMessage('No new records to upload - all addresses already exist in database.', 'error');
+                    return;
+                }
 
                 try {
                     const batchSize = 100;
@@ -603,7 +634,8 @@
                     }
 
                     document.getElementById('loading').style.display = 'none';
-                    showMessage(`✓ Successfully uploaded ${transformedData.length} records!`, 'success');
+                    const totalMsg = duplicateAddresses.length > 0 ? ` (${duplicateAddresses.length} duplicates skipped)` : '';
+                    showMessage(`✓ Successfully uploaded ${transformedData.length} records!${totalMsg}`, 'success');
                     setTimeout(() => {
                         window.location.href = 'Index.html';
                     }, 2000);
