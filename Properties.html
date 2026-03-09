@@ -292,7 +292,7 @@
             try {
                 console.log('Fetching from:', `${SUPABASE_URL}/rest/v1/properties`);
 
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/properties`, {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?order=property_id`, {
                     method: 'GET',
                     headers: {
                         'apikey': SUPABASE_API_KEY,
@@ -421,6 +421,9 @@
                 const matchesAgent = !agentFilter || prop.agent === agentFilter;
 
                 return matchesSearch && matchesStatus && matchesAgent;
+            }).sort((a, b) => {
+                // Sort by property_id
+                return a.property_id.localeCompare(b.property_id);
             });
 
             displayProperties(filtered);
