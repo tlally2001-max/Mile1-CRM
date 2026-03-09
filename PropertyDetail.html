@@ -387,7 +387,10 @@
     <div class="container">
         <div class="header">
             <h1>Property Details</h1>
-            <button class="btn-back" onclick="window.location.href='Properties.html'">← Back to Properties</button>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-back" onclick="removeProperty()" style="background: #ef4444;">🗑️ Remove Record</button>
+                <button class="btn-back" onclick="window.location.href='Properties.html'">← Back to Properties</button>
+            </div>
         </div>
 
         <div id="loading" class="loading">
@@ -1209,6 +1212,36 @@
                 setTimeout(() => loadPropertyDetails(), 1500);
             } catch (error) {
                 showStatusMessage('Error: ' + error.message, true);
+            }
+        }
+
+        async function removeProperty() {
+            const propertyId = getPropertyId();
+            const propertyName = window.currentProperty ? window.currentProperty.property_name : 'this property';
+
+            const confirmDelete = confirm(`WARNING: This will permanently delete "${propertyName}" and all related records (calls, emails, documents, installations).\n\nThis action cannot be undone. Continue?`);
+            if (!confirmDelete) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to delete property');
+
+                // Redirect to properties list after successful deletion
+                setTimeout(() => {
+                    window.location.href = 'Properties.html';
+                }, 500);
+            } catch (error) {
+                alert('Error deleting property: ' + error.message);
+                console.error('Delete error:', error);
             }
         }
 
