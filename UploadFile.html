@@ -310,6 +310,35 @@
 
             <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
 
+            <div style="margin-top: 30px; padding: 20px; background: rgba(243, 156, 18, 0.1); border: 1px solid #F39C12; border-radius: 12px;">
+                <div style="color: #F39C12; font-weight: 600; margin-bottom: 15px;">✓ Correct File Format</div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                    <thead>
+                        <tr style="background: #1a2535; border-bottom: 2px solid #3a5268;">
+                            <th style="padding: 10px; text-align: left; color: #ABB2B9; font-weight: 600;">property_name</th>
+                            <th style="padding: 10px; text-align: left; color: #ABB2B9; font-weight: 600;">address</th>
+                            <th style="padding: 10px; text-align: left; color: #ABB2B9; font-weight: 600;">url</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid #3a5268;">
+                            <td style="padding: 10px; color: #FFFFFF;">Downtown Commons</td>
+                            <td style="padding: 10px; color: #FFFFFF;">123 Main St, City</td>
+                            <td style="padding: 10px; color: #FFFFFF;">https://example.com</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #3a5268;">
+                            <td style="padding: 10px; color: #FFFFFF;">Riverside Plaza</td>
+                            <td style="padding: 10px; color: #FFFFFF;">456 Oak Ave, Town</td>
+                            <td style="padding: 10px; color: #FFFFFF;">https://example2.com</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="color: #ABB2B9; font-size: 11px; margin-top: 12px;">
+                    <strong>Required columns:</strong> property_name, address, url<br>
+                    <strong>File format:</strong> Excel (.xlsx, .xls) or CSV (.csv)
+                </div>
+            </div>
+
             <div class="file-info" id="fileInfo">
                 <strong>File:</strong> <span id="fileName"></span><br>
                 <strong>Rows:</strong> <span id="rowCount"></span>
