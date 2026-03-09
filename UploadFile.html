@@ -466,52 +466,77 @@
             document.getElementById('progressBar').classList.add('show');
             const progressFill = document.getElementById('progressFill');
 
-            // Transform data using file column names directly and generate property IDs
-            const transformedData = uploadedData.map((row, idx) => {
-                const obj = {};
-                fileColumns.forEach((col, colIdx) => {
-                    obj[col] = row[colIdx] || null;
-                });
-                // Auto-generate property_id if not provided
-                if (!obj.property_id) {
-                    obj.property_id = 'P' + String(1000 + idx + 1).slice(1);
-                }
-                return obj;
-            });
-
             try {
-                const batchSize = 100;
-                for (let i = 0; i < transformedData.length; i += batchSize) {
-                    const batch = transformedData.slice(i, i + batchSize);
+                // Get the highest property_id to generate next IDs sequentially
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?select=property_id&order=property_id.desc&limit=1`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-                    const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
-                        method: 'POST',
-                        headers: {
-                            'apikey': SUPABASE_API_KEY,
-                            'Content-Type': 'application/json',
-                            'Prefer': 'return=representation'
-                        },
-                        body: JSON.stringify(batch)
+                let nextNum = 1;
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.length > 0 && data[0].property_id) {
+                        const lastId = data[0].property_id;
+                        const num = parseInt(lastId.replace('P', ''));
+                        nextNum = num + 1;
+                    }
+                }
+
+                // Transform data using file column names directly and generate sequential property IDs
+                const transformedData = uploadedData.map((row, idx) => {
+                    const obj = {};
+                    fileColumns.forEach((col, colIdx) => {
+                        obj[col] = row[colIdx] || null;
                     });
+                    // Auto-generate sequential property_id if not provided
+                    if (!obj.property_id) {
+                        obj.property_id = 'P' + String(nextNum + idx).toString().padStart(4, '0');
+                    }
+                    return obj;
+                });
 
-                    if (!response.ok) {
-                        throw new Error(`Failed to upload batch: ${response.statusText}`);
+                try {
+                    const batchSize = 100;
+                    for (let i = 0; i < transformedData.length; i += batchSize) {
+                        const batch = transformedData.slice(i, i + batchSize);
+
+                        const uploadResponse = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+                            method: 'POST',
+                            headers: {
+                                'apikey': SUPABASE_API_KEY,
+                                'Content-Type': 'application/json',
+                                'Prefer': 'return=representation'
+                            },
+                            body: JSON.stringify(batch)
+                        });
+
+                        if (!uploadResponse.ok) {
+                            throw new Error(`Failed to upload batch: ${uploadResponse.statusText}`);
+                        }
+
+                        const progress = ((i + batch.length) / transformedData.length) * 100;
+                        progressFill.style.width = progress + '%';
                     }
 
-                    const progress = ((i + batch.length) / transformedData.length) * 100;
-                    progressFill.style.width = progress + '%';
+                    document.getElementById('loading').style.display = 'none';
+                    showMessage(`✓ Successfully uploaded ${transformedData.length} records!`, 'success');
+                    setTimeout(() => {
+                        window.location.href = 'Index.html';
+                    }, 2000);
+
+                } catch (error) {
+                    document.getElementById('loading').style.display = 'none';
+                    showMessage('Error: ' + error.message, 'error');
+                    console.error('Upload error:', error);
                 }
-
-                document.getElementById('loading').style.display = 'none';
-                showMessage(`✓ Successfully uploaded ${transformedData.length} records!`, 'success');
-                setTimeout(() => {
-                    window.location.href = 'Index.html';
-                }, 2000);
-
             } catch (error) {
                 document.getElementById('loading').style.display = 'none';
-                showMessage('Error: ' + error.message, 'error');
-                console.error('Upload error:', error);
+                showMessage('Error fetching next ID: ' + error.message, 'error');
+                console.error('ID fetch error:', error);
             }
         }
 
