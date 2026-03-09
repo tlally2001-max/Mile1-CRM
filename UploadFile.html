@@ -458,9 +458,7 @@
         }
 
         function updateColumnMapping() {
-            const table = document.getElementById('tableSelect').value;
-            if (!table) return;
-
+            const table = 'properties';
             const schema = tableSchemas[table];
             const mapping = document.getElementById('columnMapping');
             mapping.innerHTML = '<h3 style="color: #FFFFFF; margin-top: 20px; margin-bottom: 15px;">Column Mapping</h3>';
