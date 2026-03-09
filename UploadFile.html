@@ -466,12 +466,16 @@
             document.getElementById('progressBar').classList.add('show');
             const progressFill = document.getElementById('progressFill');
 
-            // Transform data using file column names directly
-            const transformedData = uploadedData.map(row => {
+            // Transform data using file column names directly and generate property IDs
+            const transformedData = uploadedData.map((row, idx) => {
                 const obj = {};
-                fileColumns.forEach((col, idx) => {
-                    obj[col] = row[idx] || null;
+                fileColumns.forEach((col, colIdx) => {
+                    obj[col] = row[colIdx] || null;
                 });
+                // Auto-generate property_id if not provided
+                if (!obj.property_id) {
+                    obj.property_id = 'P' + String(1000 + idx + 1).slice(1);
+                }
                 return obj;
             });
 

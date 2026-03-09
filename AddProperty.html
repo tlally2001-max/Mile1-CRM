@@ -283,7 +283,13 @@
             const messageEl = document.getElementById('message');
             const loadingEl = document.getElementById('loading');
 
+            // Generate property_id (timestamp-based)
+            const timestamp = Date.now().toString().slice(-5);
+            const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            const propertyId = 'P' + timestamp + randomNum;
+
             const propertyData = {
+                property_id: propertyId,
                 property_name: document.getElementById('propertyName').value,
                 address: document.getElementById('address').value,
                 url: document.getElementById('url').value,
