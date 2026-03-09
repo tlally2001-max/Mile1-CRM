@@ -656,12 +656,22 @@
 
             recentCalls = recentCalls.slice(0, 10);
 
+            // Keep only one follow-up per property
+            const seenProperties = new Set();
+            const uniqueTodaysFollowups = [];
+            todaysFollowups.forEach(followup => {
+                if (!seenProperties.has(followup.property)) {
+                    seenProperties.add(followup.property);
+                    uniqueTodaysFollowups.push(followup);
+                }
+            });
+
             return {
                 totalCalls: totalCalls,
                 dueTodayCount: dueTodayCount,
                 overdueCount: overdueCount,
                 thisWeekCount: 0,
-                todaysFollowups: todaysFollowups,
+                todaysFollowups: uniqueTodaysFollowups,
                 recentCalls: recentCalls,
                 weeklyVolume: weeklyVolume,
                 interactionBreakdown: interactionBreakdown,
