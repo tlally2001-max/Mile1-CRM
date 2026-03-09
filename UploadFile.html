@@ -315,15 +315,10 @@
                 <strong>Rows:</strong> <span id="rowCount"></span>
             </div>
 
-            <label for="tableSelect">Select Target Table *</label>
-            <select id="tableSelect" required>
-                <option value="">-- Select a table --</option>
-                <option value="properties">Properties</option>
-                <option value="calls">Calls</option>
-                <option value="emails">Emails</option>
-                <option value="documents">Documents</option>
-                <option value="installations">Installations</option>
-            </select>
+            <label>Target Table</label>
+            <div style="padding: 12px; background: #1a2535; border-radius: 6px; border: 1px solid #3a5268; color: #FFFFFF;">
+                📊 Properties
+            </div>
 
             <div id="columnMapping"></div>
 
@@ -496,14 +491,12 @@
             previewTable.classList.add('show');
         }
 
-        document.getElementById('tableSelect').addEventListener('change', updateColumnMapping);
+        // Auto-select properties table on load
+        document.getElementById('tableSelect').value = 'properties';
+        updateColumnMapping();
 
         async function uploadData() {
-            const table = document.getElementById('tableSelect').value;
-            if (!table) {
-                showMessage('Please select a table', 'error');
-                return;
-            }
+            const table = 'properties';
 
             const schema = tableSchemas[table];
             const mapping = {};
