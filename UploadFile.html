@@ -442,15 +442,20 @@
 
                 const csvText = await response.text();
 
-                // Parse CSV using Papa Parse
+                // Parse CSV using Papa Parse and upload directly
                 Papa.parse(csvText, {
-                    complete: (results) => {
+                    complete: async (results) => {
                         const data = results.data.filter(row => row.some(cell => cell));
                         if (data.length < 2) {
                             showMessage('Sheet must contain headers and at least one data row', 'error');
                             return;
                         }
-                        processData(data, 'Google Sheet');
+
+                        fileColumns = data[0];
+                        uploadedData = data.slice(1);
+
+                        // Upload directly without showing preview
+                        await uploadDataDirect();
                     },
                     error: (error) => {
                         showMessage('Error parsing sheet: ' + error.message, 'error');
@@ -527,6 +532,11 @@
         // Auto-generate column mapping on file load
         function initializeColumnMapping() {
             updateColumnMapping();
+        }
+
+        async function uploadDataDirect() {
+            // Used by Google Sheets upload - goes straight to upload without preview
+            await uploadData();
         }
 
         async function uploadData() {
