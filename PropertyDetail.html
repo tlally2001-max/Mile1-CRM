@@ -499,7 +499,7 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                         <div>
                             <label style="display: block; color: #ABB2B9; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Date Called *</label>
-                            <input type="date" id="callDate" required style="width: 100%; padding: 10px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px;">
+                            <input type="date" id="callDate" required onchange="setFollowupDate7Days()" style="width: 100%; padding: 10px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px;">
                         </div>
                         <div>
                             <label style="display: block; color: #ABB2B9; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Interaction Type *</label>
@@ -634,6 +634,10 @@
                 <div class="modal-field">
                     <label class="modal-label">Message</label>
                     <textarea id="emailBody" class="modal-textarea" required placeholder="Dear {name},&#10;&#10;...&#10;&#10;Best regards"></textarea>
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label">Follow-up Date (7 days from now)</label>
+                    <input type="date" id="emailFollowupDate" class="modal-input">
                 </div>
                 <div class="modal-field" id="emailSendMessage" style="display: none; padding: 10px; border-radius: 6px; text-align: center; font-size: 12px;"></div>
                 <div class="modal-buttons">
@@ -1231,6 +1235,24 @@
             document.getElementById('errorText').textContent = '⚠️ ' + message;
         }
 
+        // Set follow-up date to 7 days from call date
+        function setFollowupDate7Days() {
+            const callDateInput = document.getElementById('callDate');
+            const nextFollowupInput = document.getElementById('nextFollowup');
+
+            if (callDateInput.value) {
+                const callDate = new Date(callDateInput.value);
+                const followupDate = new Date(callDate);
+                followupDate.setDate(followupDate.getDate() + 7);
+
+                // Format date as YYYY-MM-DD for input field
+                const year = followupDate.getFullYear();
+                const month = String(followupDate.getMonth() + 1).padStart(2, '0');
+                const day = String(followupDate.getDate()).padStart(2, '0');
+                nextFollowupInput.value = `${year}-${month}-${day}`;
+            }
+        }
+
         // Save call
         async function saveCall(event) {
             event.preventDefault();
@@ -1349,6 +1371,15 @@
             document.getElementById('emailSubject').value = 'Solar Energy Solutions';
             document.getElementById('emailBody').value = 'Dear {name},\n\nI hope this email finds you well. We are reaching out to you regarding solar energy solutions for ' + (window.currentProperty ? window.currentProperty.property_name : 'your property') + '.\n\nPlease feel free to reach out if you have any questions.\n\nBest regards';
 
+            // Auto-set follow-up date to 7 days from today
+            const today = new Date();
+            const followupDate = new Date(today);
+            followupDate.setDate(followupDate.getDate() + 7);
+            const year = followupDate.getFullYear();
+            const month = String(followupDate.getMonth() + 1).padStart(2, '0');
+            const day = String(followupDate.getDate()).padStart(2, '0');
+            document.getElementById('emailFollowupDate').value = `${year}-${month}-${day}`;
+
             modal.style.display = 'block';
         }
 
@@ -1378,6 +1409,7 @@
                 // Log email to Supabase first
                 const now = new Date();
                 const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+                const followupDate = document.getElementById('emailFollowupDate').value;
 
                 const emailData = {
                     property_id: propertyId,
@@ -1388,7 +1420,7 @@
                     recipient_name: emailToName,
                     subject: emailSubject,
                     body: emailBody,
-                    notes: 'Sent from CRM interface'
+                    notes: 'Sent from CRM interface' + (followupDate ? ' | Follow-up: ' + followupDate : '')
                 };
 
                 // Save to Supabase
