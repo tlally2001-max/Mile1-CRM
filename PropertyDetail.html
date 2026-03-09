@@ -400,7 +400,6 @@
                     <div>
                         <div class="property-id" id="propertyId"></div>
                         <div class="property-name" id="propertyName"></div>
-                        <div class="status-badge" id="status"></div>
                         <div class="info-item" style="margin-top: 15px;">
                             <div class="info-label">Address</div>
                             <div class="info-value" id="address"></div>
@@ -815,7 +814,6 @@
             document.getElementById('agentSelect').value = property.agent || 'Unassigned';
             document.getElementById('propertyManagerFirstName').value = property.property_manager_first_name || '';
             document.getElementById('propertyManagerLastName').value = property.property_manager_last_name || '';
-            document.getElementById('status').textContent = property.status || 'New';
 
             if (property.url) {
                 document.getElementById('propertyUrl').href = property.url;
