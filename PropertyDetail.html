@@ -1068,6 +1068,36 @@
                 });
                 if (!propResponse.ok) throw new Error('Failed to update property status');
 
+                // Auto-create follow-up call 7 days out when IA is Sent
+                if (status === 'Sent') {
+                    const now = new Date();
+                    const followupDate = new Date(now);
+                    followupDate.setDate(followupDate.getDate() + 7);
+                    const followupYear = followupDate.getFullYear();
+                    const followupMonth = String(followupDate.getMonth() + 1).padStart(2, '0');
+                    const followupDay = String(followupDate.getDate()).padStart(2, '0');
+                    const followupDateStr = `${followupYear}-${followupMonth}-${followupDay}`;
+
+                    const callData = {
+                        property_id: propertyId,
+                        date_called: now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0'),
+                        interaction_type: 'IA Follow-up',
+                        spoke_with: '',
+                        notes: 'Auto follow-up for IA Sent',
+                        next_followup_date: followupDateStr
+                    };
+
+                    const callResponse = await fetch(`${SUPABASE_URL}/rest/v1/calls`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(callData)
+                    });
+                    if (!callResponse.ok) console.error('Failed to create follow-up call');
+                }
+
                 showStatusMessage('IA Status updated!');
                 setTimeout(() => loadPropertyDetails(), 1000);
             } catch (error) {
@@ -1334,13 +1364,27 @@
             event.preventDefault();
 
             const propertyId = getPropertyId();
+            const callDate = document.getElementById('callDate').value;
+            const interactionType = document.getElementById('interactionType').value;
+
+            // Auto-set follow-up date to 7 days for voicemail/no answer
+            let nextFollowupDate = document.getElementById('nextFollowup').value || null;
+            if (!nextFollowupDate && (interactionType === 'Voicemail Left' || interactionType === 'Voicemail' || interactionType === 'No Answer')) {
+                const followupDateObj = new Date(callDate);
+                followupDateObj.setDate(followupDateObj.getDate() + 7);
+                const year = followupDateObj.getFullYear();
+                const month = String(followupDateObj.getMonth() + 1).padStart(2, '0');
+                const day = String(followupDateObj.getDate()).padStart(2, '0');
+                nextFollowupDate = `${year}-${month}-${day}`;
+            }
+
             const callData = {
                 property_id: propertyId,
-                date_called: document.getElementById('callDate').value,
-                interaction_type: document.getElementById('interactionType').value,
+                date_called: callDate,
+                interaction_type: interactionType,
                 spoke_with: document.getElementById('spokeWith').value,
                 notes: document.getElementById('notes').value,
-                next_followup_date: document.getElementById('nextFollowup').value || null
+                next_followup_date: nextFollowupDate
             };
 
             try {
