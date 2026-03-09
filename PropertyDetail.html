@@ -473,6 +473,17 @@
                     </div>
                 </div>
 
+                <div class="info-grid" style="margin-top: 20px;">
+                    <div class="info-item">
+                        <div class="info-label">Property Manager First Name</div>
+                        <input type="text" id="propertyManagerFirstName" style="width: 100%; padding: 8px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px; font-size: 14px; margin-top: 5px;">
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Property Manager Last Name</div>
+                        <input type="text" id="propertyManagerLastName" style="width: 100%; padding: 8px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px; font-size: 14px; margin-top: 5px;">
+                    </div>
+                </div>
+
                 <div style="margin-top: 20px; display: flex; gap: 10px;">
                     <button type="button" onclick="updatePropertyDetails()" style="flex: 1; padding: 10px 20px; background: #F39C12; color: white; border: none; border-radius: 24px; cursor: pointer; font-weight: 600; font-size: 14px;">💾 Update</button>
                 </div>
@@ -730,6 +741,34 @@
                 agent: document.getElementById('agentSelect').value || 'Unassigned'
             };
 
+            // Handle property manager - create or update
+            const pmFirstName = document.getElementById('propertyManagerFirstName').value;
+            const pmLastName = document.getElementById('propertyManagerLastName').value;
+
+            if (pmFirstName || pmLastName) {
+                try {
+                    // First, check if property manager exists for this property
+                    const existingPM = await fetch(`${SUPABASE_URL}/rest/v1/property_managers?select=id&property_id=eq.${propertyId}`, {
+                        method: 'GET',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const pmData = {
+                        first_name: pmFirstName || null,
+                        last_name: pmLastName || null
+                    };
+
+                    // For now, just store the first and last name in the property
+                    updateData.property_manager_first_name = pmFirstName || null;
+                    updateData.property_manager_last_name = pmLastName || null;
+                } catch (error) {
+                    console.error('Error handling property manager:', error);
+                }
+            }
+
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
                     method: 'PATCH',
@@ -774,6 +813,8 @@
             document.getElementById('phoneInput').value = property.phone_number || '';
             document.getElementById('unitsInput').value = property.units || '';
             document.getElementById('agentSelect').value = property.agent || 'Unassigned';
+            document.getElementById('propertyManagerFirstName').value = property.property_manager_first_name || '';
+            document.getElementById('propertyManagerLastName').value = property.property_manager_last_name || '';
             document.getElementById('status').textContent = property.status || 'New';
 
             if (property.url) {
