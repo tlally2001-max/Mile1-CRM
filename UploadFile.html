@@ -519,9 +519,10 @@
             previewTable.classList.add('show');
         }
 
-        // Auto-select properties table on load
-        document.getElementById('tableSelect').value = 'properties';
-        updateColumnMapping();
+        // Auto-generate column mapping on file load
+        function initializeColumnMapping() {
+            updateColumnMapping();
+        }
 
         async function uploadData() {
             const table = 'properties';
