@@ -410,6 +410,11 @@
                 return;
             }
 
+            if (typeof Papa === 'undefined') {
+                showMessage('CSV parser not loaded. Please try again.', 'error');
+                return;
+            }
+
             try {
                 // Extract sheet ID from the URL
                 const sheetIdMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
