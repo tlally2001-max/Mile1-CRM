@@ -481,13 +481,29 @@
                     </div>
                 </div>
 
-                <div class="info-grid">
+                <div class="info-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div class="info-item">
                         <div class="info-label">Agent</div>
                         <select id="agentSelect" style="width: 100%; padding: 8px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px; font-size: 14px; margin-top: 5px;">
                             <option value="Unassigned">Unassigned</option>
                             <option value="Tom">Tom</option>
                             <option value="Deneane">Deneane</option>
+                        </select>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Status</div>
+                        <select id="propertyStatusSelect" onchange="updatePropertyStatus()" style="width: 100%; padding: 8px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px; font-size: 14px; margin-top: 5px;">
+                            <option value="">Select Status</option>
+                            <option value="New">New</option>
+                            <option value="Contacted">Contacted</option>
+                            <option value="IA Sent">IA Sent</option>
+                            <option value="IA Signed">IA Signed</option>
+                            <option value="TPV Sent">TPV Sent</option>
+                            <option value="TPV Signed">TPV Signed</option>
+                            <option value="Installed">Installed</option>
+                            <option value="Voicemail Left">Voicemail Left</option>
+                            <option value="No Answer">No Answer</option>
+                            <option value="No Access">No Access</option>
                         </select>
                     </div>
                 </div>
@@ -808,6 +824,7 @@
             document.getElementById('phoneInput').value = property.phone_number || '';
             document.getElementById('unitsInput').value = property.units || '';
             document.getElementById('agentSelect').value = property.agent || 'Unassigned';
+            document.getElementById('propertyStatusSelect').value = property.status || '';
             document.getElementById('propertyManagerEmail').value = property.property_manager_email || '';
             document.getElementById('propertyManagerFirstName').value = property.property_manager_first_name || '';
             document.getElementById('propertyManagerLastName').value = property.property_manager_last_name || '';
@@ -1227,6 +1244,30 @@
                 }
                 showStatusMessage('Paid status updated!');
                 setTimeout(() => loadPropertyDetails(), 1500);
+            } catch (error) {
+                showStatusMessage('Error: ' + error.message, true);
+            }
+        }
+
+        async function updatePropertyStatus() {
+            const propertyId = getPropertyId();
+            const status = document.getElementById('propertyStatusSelect').value;
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: status || null
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to update property status');
+                showStatusMessage('Status updated!');
+                setTimeout(() => loadPropertyDetails(), 1000);
             } catch (error) {
                 showStatusMessage('Error: ' + error.message, true);
             }
