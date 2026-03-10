@@ -886,6 +886,7 @@
                 <table>
                     <thead>
                         <tr>
+                            <th></th>
                             <th>Type</th>
                             <th>Date Sent</th>
                             <th>Status</th>
@@ -895,17 +896,34 @@
             `;
 
             emails.forEach(email => {
+                const emailId = `email-${email.id}`;
                 html += `
                     <tr>
+                        <td style="text-align: center; padding: 8px;"><span onclick="toggleEmailDetails('${emailId}')" style="cursor: pointer; font-size: 14px; color: #F39C12;">▼</span></td>
                         <td>${email.email_type || '-'}</td>
                         <td>${formatDate(email.date_sent) || '-'}</td>
                         <td>${email.status || '-'}</td>
+                    </tr>
+                    <tr id="${emailId}" style="display: none;">
+                        <td colspan="4" style="padding: 12px; background: #1a2535; border-top: 0;">
+                            <div style="color: #ABB2B9; font-size: 12px;">
+                                <strong style="color: #F39C12;">Subject:</strong> ${email.subject || 'No subject'}<br/>
+                                <strong style="color: #F39C12; margin-top: 8px; display: block;">Body:</strong> ${email.body || 'No body'}
+                            </div>
+                        </td>
                     </tr>
                 `;
             });
 
             html += '</tbody></table>';
             container.innerHTML = html;
+        }
+
+        function toggleEmailDetails(emailId) {
+            const row = document.getElementById(emailId);
+            if (row) {
+                row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+            }
         }
 
         function displayDocuments(documents) {
