@@ -450,10 +450,13 @@
                     <div class="stat-value" id="callsToday">0</div>
                     <div class="stat-subtitle" id="callsTodayCompare">(Up from yesterday)</div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-label">Upcoming Installs:</div>
-                    <div class="stat-value" id="dueTodayValue">0</div>
-                    <div class="stat-subtitle warning" id="overdueCompare">(overdue)</div>
+                <div class="stat-box" style="grid-column: 1 / -1; padding: 0;">
+                    <div style="padding: 20px; border-bottom: 1px solid #3a5268;">
+                        <div class="stat-label">Upcoming Installs:</div>
+                    </div>
+                    <div id="upcomingInstallsContent" style="overflow-x: auto;">
+                        <div class="empty-state">No installs scheduled</div>
+                    </div>
                 </div>
             </div>
 
@@ -565,6 +568,7 @@
 
             const propertiesData = await fetchSupabaseData('properties');
             const callsData = await fetchSupabaseData('calls');
+            const installationsData = await fetchSupabaseData('installations');
 
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -666,6 +670,25 @@
                 }
             });
 
+            // Process upcoming installs (properties with installation dates)
+            let upcomingInstalls = [];
+            installationsData.forEach(install => {
+                if (install.date_installed) {
+                    const property = propertiesData.find(p => p.id === install.property_id);
+                    if (property) {
+                        const units = property.units || 0;
+                        upcomingInstalls.push({
+                            propertyId: property.property_id,
+                            propertyName: property.property_name,
+                            address: property.address,
+                            units: units,
+                            totalPayment: units * 4,
+                            installDate: install.date_installed
+                        });
+                    }
+                }
+            });
+
             return {
                 totalCalls: totalCalls,
                 dueTodayCount: dueTodayCount,
@@ -673,6 +696,7 @@
                 thisWeekCount: 0,
                 todaysFollowups: uniqueTodaysFollowups,
                 recentCalls: recentCalls,
+                upcomingInstalls: upcomingInstalls,
                 weeklyVolume: weeklyVolume,
                 interactionBreakdown: interactionBreakdown,
                 prospectCount: propertiesData.length || 0,
@@ -764,13 +788,14 @@
 
             // Update top stats
             document.getElementById('callsToday').textContent = data.totalCalls || 0;
-            document.getElementById('dueTodayValue').textContent = data.dueTodayCount || 0;
-            document.getElementById('overdueCompare').textContent = `(${data.overdueCount || 0} Overdue)`;
             document.getElementById('propertiesCount').textContent = data.prospectCount || 0;
 
             // Update follow-up count
             const followupCount = data.todaysFollowups ? data.todaysFollowups.length : 0;
             document.getElementById('followupCount').textContent = `TODAY'S FOLLOW-UPS (${followupCount} Total)`;
+
+            // Display upcoming installs in stat box
+            displayUpcomingInstalls(data.upcomingInstalls || []);
 
             // Display today's follow-ups
             displayTodaysFollowups(data.todaysFollowups || []);
@@ -828,6 +853,42 @@
                         <td>${followup.interaction || '-'}</td>
                         <td>${formatDate(followup.followupDate) || '-'}</td>
                         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        function displayUpcomingInstalls(installs) {
+            const container = document.getElementById('upcomingInstallsContent');
+
+            if (!installs || installs.length === 0) {
+                container.innerHTML = `<div class="empty-state">No installs scheduled</div>`;
+                return;
+            }
+
+            let html = `
+                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid #3a5268; background: #1a2535;">
+                            <th style="padding: 12px; text-align: left; color: #ABB2B9;">Property Name</th>
+                            <th style="padding: 12px; text-align: left; color: #ABB2B9;">Address</th>
+                            <th style="padding: 12px; text-align: center; color: #ABB2B9;">Units</th>
+                            <th style="padding: 12px; text-align: right; color: #ABB2B9;">Total Payment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            installs.forEach(install => {
+                html += `
+                    <tr style="border-bottom: 1px solid #3a5268;">
+                        <td style="padding: 12px; color: #FFFFFF;"><strong>${install.propertyName || '-'}</strong></td>
+                        <td style="padding: 12px; color: #FFFFFF; font-size: 11px;">${install.address || '-'}</td>
+                        <td style="padding: 12px; text-align: center; color: #FFFFFF;">${install.units || 0}</td>
+                        <td style="padding: 12px; text-align: right; color: #F39C12; font-weight: 600;">$${install.totalPayment.toLocaleString()}</td>
                     </tr>
                 `;
             });
