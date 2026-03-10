@@ -752,7 +752,8 @@
             const today = new Date();
             const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-            document.getElementById('welcomeText').textContent = 'WELCOME, TOM!';
+            let welcomeName = currentAgentFilter === 'All' ? 'WELCOME!' : `WELCOME, ${currentAgentFilter.toUpperCase()}!`;
+            document.getElementById('welcomeText').textContent = welcomeName;
             document.getElementById('dateText').textContent = `Today is ${dateStr}. Real Estate Call CRM.`;
         }
 
