@@ -424,6 +424,14 @@
                 <div class="nav-item" onclick="window.location.href='https://mile1-map.vercel.app/'" style="cursor: pointer;">
                     <span>🗺️</span> Mile 1 Map
                 </div>
+
+                <!-- Agent Filter -->
+                <div style="border-top: 1px solid #3a5268; margin-top: 20px; padding-top: 20px;">
+                    <div style="color: #ABB2B9; font-size: 11px; font-weight: 600; text-transform: uppercase; padding: 0 15px; margin-bottom: 10px;">Filter Agent</div>
+                    <button onclick="filterByAgent('All')" id="filterAll" class="nav-item" style="background: #3a5268; color: #F39C12; width: 100%; text-align: left; margin-bottom: 5px;">✓ All</button>
+                    <button onclick="filterByAgent('Tom')" id="filterTom" class="nav-item" style="background: transparent; color: #ABB2B9; width: 100%; text-align: left; margin-bottom: 5px; border: none;">👤 Tom</button>
+                    <button onclick="filterByAgent('Deneane')" id="filterDeneane" class="nav-item" style="background: transparent; color: #ABB2B9; width: 100%; text-align: left; border: none;">👤 Deneane</button>
+                </div>
             </div>
         </div>
 
@@ -456,14 +464,6 @@
                         <div class="empty-state">No installs scheduled</div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Agent Filter -->
-            <div style="margin: 20px 0; display: flex; gap: 10px; align-items: center;">
-                <span style="color: #ABB2B9; font-weight: 600;">Filter by Agent:</span>
-                <button onclick="filterByAgent('All')" id="filterAll" class="btn btn-primary" style="padding: 8px 16px; font-size: 12px;">All</button>
-                <button onclick="filterByAgent('Tom')" id="filterTom" class="btn btn-secondary" style="padding: 8px 16px; font-size: 12px;">Tom</button>
-                <button onclick="filterByAgent('Deneane')" id="filterDeneane" class="btn btn-secondary" style="padding: 8px 16px; font-size: 12px;">Deneane</button>
             </div>
 
             <!-- Main Grid -->
