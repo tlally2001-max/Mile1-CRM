@@ -719,8 +719,11 @@
             // Apply agent filter
             let filteredRecentCalls = recentCalls;
             let filteredUpcomingInstalls = upcomingInstalls;
+            let filteredProperties = propertiesData;
 
             if (currentAgentFilter !== 'All') {
+                filteredProperties = propertiesData.filter(p => p.agent === currentAgentFilter);
+
                 filteredRecentCalls = recentCalls.filter(call => {
                     const property = propertiesData.find(p => p.property_id === call.property);
                     return property && property.agent === currentAgentFilter;
@@ -742,7 +745,7 @@
                 upcomingInstalls: filteredUpcomingInstalls,
                 weeklyVolume: weeklyVolume,
                 interactionBreakdown: interactionBreakdown,
-                prospectCount: propertiesData.length || 0,
+                prospectCount: filteredProperties.length || 0,
                 propertiesNoContact: 0
             };
         }
