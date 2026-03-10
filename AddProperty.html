@@ -363,7 +363,9 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to save property: ' + response.statusText);
+                    const errorText = await response.text();
+                    console.error('Supabase error response:', errorText);
+                    throw new Error('Failed to save property: ' + response.statusText + ' - ' + errorText);
                 }
 
                 loadingEl.style.display = 'none';
