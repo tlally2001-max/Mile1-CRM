@@ -1064,7 +1064,6 @@
                     '': null
                 };
                 const propertyStatus = propertyStatusMap[status];
-                console.log('Updating IA property status:', { propertyId, propertyStatus });
                 const propResponse = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
                     method: 'PATCH',
                     headers: {
@@ -1074,9 +1073,8 @@
                     },
                     body: JSON.stringify({ status: propertyStatus })
                 });
-                const respText = await propResponse.text();
-                console.log('IA property update response:', propResponse.status, respText);
-                if (!propResponse.ok) throw new Error('Failed to update property status: ' + respText);
+                if (!propResponse.ok) throw new Error('Failed to update property status');
+
 
                 showStatusMessage('IA Status updated!');
                 setTimeout(() => loadPropertyDetails(), 1000);
