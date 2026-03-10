@@ -832,6 +832,7 @@
                 <table>
                     <thead>
                         <tr>
+                            <th></th>
                             <th>Date</th>
                             <th>Type</th>
                             <th>Spoke With</th>
@@ -842,20 +843,36 @@
                     <tbody>
             `;
 
-            calls.forEach(call => {
+            calls.forEach((call, index) => {
+                const callId = `call-${call.id}`;
                 html += `
                     <tr>
+                        <td style="text-align: center; padding: 8px;"><span onclick="toggleCallNotes('${callId}')" style="cursor: pointer; font-size: 14px; color: #F39C12;">▼</span></td>
                         <td>${formatDate(call.date_called) || '-'}</td>
                         <td>${call.interaction_type || '-'}</td>
                         <td>${call.spoke_with || 'N/A'}</td>
                         <td>${formatDate(call.next_followup_date) || '-'}</td>
                         <td><button onclick="deleteCall(${call.id})" style="background: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 12px; cursor: pointer; font-size: 11px; font-weight: 600;">Delete</button></td>
                     </tr>
+                    <tr id="${callId}" style="display: none;">
+                        <td colspan="6" style="padding: 12px; background: #1a2535; border-top: 0;">
+                            <div style="color: #ABB2B9; font-size: 12px;">
+                                <strong style="color: #F39C12;">Notes:</strong> ${call.notes || 'No notes'}
+                            </div>
+                        </td>
+                    </tr>
                 `;
             });
 
             html += '</tbody></table>';
             container.innerHTML = html;
+        }
+
+        function toggleCallNotes(callId) {
+            const row = document.getElementById(callId);
+            if (row) {
+                row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+            }
         }
 
         function displayEmails(emails) {
