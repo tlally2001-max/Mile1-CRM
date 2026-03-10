@@ -458,6 +458,14 @@
                 </div>
             </div>
 
+            <!-- Agent Filter -->
+            <div style="margin: 20px 0; display: flex; gap: 10px; align-items: center;">
+                <span style="color: #ABB2B9; font-weight: 600;">Filter by Agent:</span>
+                <button onclick="filterByAgent('All')" id="filterAll" class="btn btn-primary" style="padding: 8px 16px; font-size: 12px;">All</button>
+                <button onclick="filterByAgent('Tom')" id="filterTom" class="btn btn-secondary" style="padding: 8px 16px; font-size: 12px;">Tom</button>
+                <button onclick="filterByAgent('Deneane')" id="filterDeneane" class="btn btn-secondary" style="padding: 8px 16px; font-size: 12px;">Deneane</button>
+            </div>
+
             <!-- Main Grid -->
             <div class="main-grid">
                 <!-- Left: Quick Actions -->
@@ -558,6 +566,22 @@
                 console.error(`Error fetching ${table}:`, error);
                 return [];
             }
+        }
+
+        // Current agent filter
+        let currentAgentFilter = 'All';
+
+        // Filter by agent and reload dashboard
+        function filterByAgent(agent) {
+            currentAgentFilter = agent;
+
+            // Update button styles
+            document.getElementById('filterAll').className = agent === 'All' ? 'btn btn-primary' : 'btn btn-secondary';
+            document.getElementById('filterTom').className = agent === 'Tom' ? 'btn btn-primary' : 'btn btn-secondary';
+            document.getElementById('filterDeneane').className = agent === 'Deneane' ? 'btn btn-primary' : 'btn btn-secondary';
+
+            // Reload with new filter
+            loadDashboard();
         }
 
         // Calculate dashboard data from Supabase
@@ -692,14 +716,30 @@
             });
             console.log('Final upcomingInstalls:', upcomingInstalls);
 
+            // Apply agent filter
+            let filteredRecentCalls = recentCalls;
+            let filteredUpcomingInstalls = upcomingInstalls;
+
+            if (currentAgentFilter !== 'All') {
+                filteredRecentCalls = recentCalls.filter(call => {
+                    const property = propertiesData.find(p => p.property_id === call.property);
+                    return property && property.agent === currentAgentFilter;
+                });
+
+                filteredUpcomingInstalls = upcomingInstalls.filter(install => {
+                    const property = propertiesData.find(p => p.property_id === install.propertyId);
+                    return property && property.agent === currentAgentFilter;
+                });
+            }
+
             return {
                 totalCalls: totalCalls,
                 dueTodayCount: dueTodayCount,
                 overdueCount: overdueCount,
                 thisWeekCount: 0,
                 todaysFollowups: uniqueTodaysFollowups,
-                recentCalls: recentCalls,
-                upcomingInstalls: upcomingInstalls,
+                recentCalls: filteredRecentCalls,
+                upcomingInstalls: filteredUpcomingInstalls,
                 weeklyVolume: weeklyVolume,
                 interactionBreakdown: interactionBreakdown,
                 prospectCount: propertiesData.length || 0,
