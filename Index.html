@@ -675,7 +675,7 @@
             installationsData.forEach(install => {
                 console.log('Checking install:', install);
                 if (install.date_installed) {
-                    const property = propertiesData.find(p => p.id === install.property_id);
+                    const property = propertiesData.find(p => p.property_id === install.property_id);
                     console.log('Found property:', property, 'for install property_id:', install.property_id);
                     if (property) {
                         const units = property.units || 0;
