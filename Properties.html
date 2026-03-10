@@ -371,9 +371,10 @@
         }
 
         function populateAgentFilter() {
-            // Get unique agents
-            const agents = [...new Set(allProperties.map(p => p.agent).filter(a => a))].sort();
             const agentSelect = document.getElementById('agentFilter');
+
+            // Add hardcoded agents
+            const agents = ['Tom', 'Deneane'];
 
             agents.forEach(agent => {
                 const option = document.createElement('option');
