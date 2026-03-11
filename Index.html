@@ -949,6 +949,7 @@
                             <th style="padding: 12px; text-align: left; color: #ABB2B9;">Property Name</th>
                             <th style="padding: 12px; text-align: left; color: #ABB2B9;">Address</th>
                             <th style="padding: 12px; text-align: center; color: #ABB2B9;">Units</th>
+                            <th style="padding: 12px; text-align: center; color: #ABB2B9;">Install Date</th>
                             <th style="padding: 12px; text-align: right; color: #ABB2B9;">Total Payment</th>
                         </tr>
                     </thead>
@@ -961,6 +962,7 @@
                         <td style="padding: 12px; color: #FFFFFF;"><strong>${install.propertyName || '-'}</strong></td>
                         <td style="padding: 12px; color: #FFFFFF; font-size: 11px;">${install.address || '-'}</td>
                         <td style="padding: 12px; text-align: center; color: #FFFFFF;">${install.units || 0}</td>
+                        <td style="padding: 12px; text-align: center; color: #F39C12; font-weight: 600;">${install.installDate || '-'}</td>
                         <td style="padding: 12px; text-align: right; color: #F39C12; font-weight: 600;">$${install.totalPayment.toLocaleString()}</td>
                     </tr>
                 `;
