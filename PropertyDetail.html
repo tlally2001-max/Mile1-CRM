@@ -1323,7 +1323,22 @@
             }
 
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
+                // Delete in order to respect foreign key constraints
+                const tables = ['calls', 'emails', 'documents', 'installations'];
+
+                for (const table of tables) {
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?property_id=eq.${propertyId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    console.log(`Deleted from ${table}:`, response.status);
+                }
+
+                // Now delete the property itself
+                const propResponse = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
                     method: 'DELETE',
                     headers: {
                         'apikey': SUPABASE_API_KEY,
@@ -1331,11 +1346,11 @@
                     }
                 });
 
-                const text = await response.text();
-                console.log('Delete response status:', response.status);
-                console.log('Delete response text:', text);
+                const text = await propResponse.text();
+                console.log('Property delete response status:', propResponse.status);
+                console.log('Property delete response text:', text);
 
-                if (!response.ok) throw new Error(`Failed to delete property: ${response.status} - ${text}`);
+                if (!propResponse.ok) throw new Error(`Failed to delete property: ${propResponse.status} - ${text}`);
 
                 // Redirect to properties list after successful deletion
                 setTimeout(() => {
