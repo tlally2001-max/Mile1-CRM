@@ -489,6 +489,14 @@
                             <option value="Deneane">Deneane</option>
                         </select>
                     </div>
+                    <div class="info-item">
+                        <div class="info-label">Priority</div>
+                        <select id="prioritySelect" style="width: 100%; padding: 8px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px; font-size: 14px; margin-top: 5px;">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div style="margin-top: 20px; display: flex; gap: 10px;">
@@ -755,6 +763,7 @@
             const phoneValue = document.getElementById('phoneInput').value;
             const unitsValue = document.getElementById('unitsInput').value;
             const agentValue = document.getElementById('agentSelect').value;
+            const priorityValue = document.getElementById('prioritySelect').value;
             const pmEmail = document.getElementById('propertyManagerEmail').value;
             const pmFirstName = document.getElementById('propertyManagerFirstName').value;
             const pmLastName = document.getElementById('propertyManagerLastName').value;
@@ -763,6 +772,7 @@
                 phone_number: phoneValue ? phoneValue : null,
                 units: unitsValue ? parseInt(unitsValue) : null,
                 agent: agentValue || 'Unassigned',
+                priority: priorityValue || 'Medium',
                 property_manager_email: pmEmail ? pmEmail : null,
                 property_manager_first_name: pmFirstName ? pmFirstName : null,
                 property_manager_last_name: pmLastName ? pmLastName : null
@@ -812,6 +822,7 @@
             document.getElementById('phoneInput').value = property.phone_number || '';
             document.getElementById('unitsInput').value = property.units || '';
             document.getElementById('agentSelect').value = property.agent || 'Unassigned';
+            document.getElementById('prioritySelect').value = property.priority || 'Medium';
             document.getElementById('propertyManagerEmail').value = property.property_manager_email || '';
             document.getElementById('propertyManagerFirstName').value = property.property_manager_first_name || '';
             document.getElementById('propertyManagerLastName').value = property.property_manager_last_name || '';
