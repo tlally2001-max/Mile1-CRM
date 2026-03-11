@@ -479,6 +479,14 @@
                                 <div style="font-size: 11px; color: #ABB2B9; margin-top: 3px;">Pick date manually from calendar</div>
                             </div>
 
+                            <div class="info-item" style="margin-bottom: 12px;">
+                                <div class="info-label">Installation Confirmed</div>
+                                <select id="installConfirmedSelect" onchange="updateInstallConfirmed()" style="width: 100%; padding: 4px 6px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px; font-size: 12px;">
+                                    <option value="false">No</option>
+                                    <option value="true">Yes ✓</option>
+                                </select>
+                            </div>
+
                             <div class="info-item">
                                 <div class="info-label">Paid Status</div>
                                 <select id="paidStatusSelect" onchange="updatePaidStatus()" style="width: 100%; padding: 4px 6px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px; font-size: 12px;">
@@ -1088,6 +1096,7 @@
             window.currentInstallation = null;
             let installDateValue = '';
             let paidStatusValue = 'false';
+            let installConfirmedValue = 'false';
             if (installations && installations.length > 0) {
                 const inst = installations[0];
                 window.currentInstallation = inst;
@@ -1095,8 +1104,10 @@
                     installDateValue = inst.date_installed;
                 }
                 paidStatusValue = inst.paid ? 'true' : 'false';
+                installConfirmedValue = inst.installation_confirmed ? 'true' : 'false';
             }
             document.getElementById('installDateInput').value = installDateValue;
+            document.getElementById('installConfirmedSelect').value = installConfirmedValue;
             document.getElementById('paidStatusSelect').value = paidStatusValue;
         }
 
@@ -1305,6 +1316,44 @@
                     if (!response.ok) throw new Error('Failed to update installation date');
                 }
                 showStatusMessage('Installation date updated!');
+            } catch (error) {
+                showStatusMessage('Error: ' + error.message, true);
+            }
+        }
+
+        async function updateInstallConfirmed() {
+            const propertyId = getPropertyId();
+            const confirmed = document.getElementById('installConfirmedSelect').value === 'true';
+
+            try {
+                if (!window.currentInstallation) {
+                    // Create new installation
+                    const instData = {
+                        property_id: propertyId,
+                        installation_confirmed: confirmed
+                    };
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/installations`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(instData)
+                    });
+                    if (!response.ok) throw new Error('Failed to create installation');
+                } else {
+                    // Update existing installation
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/installations?id=eq.${window.currentInstallation.id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ installation_confirmed: confirmed })
+                    });
+                    if (!response.ok) throw new Error('Failed to update installation confirmed');
+                }
+                showStatusMessage('Installation confirmed status updated!');
             } catch (error) {
                 showStatusMessage('Error: ' + error.message, true);
             }
