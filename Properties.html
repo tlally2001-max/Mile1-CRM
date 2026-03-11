@@ -293,12 +293,13 @@
             try {
                 console.log('Fetching from:', `${SUPABASE_URL}/rest/v1/properties`);
 
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?order=property_id`, {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?order=property_id&_t=${Date.now()}`, {
                     method: 'GET',
                     headers: {
                         'apikey': SUPABASE_API_KEY,
                         'Content-Type': 'application/json',
-                        'Prefer': 'return=representation'
+                        'Prefer': 'return=representation',
+                        'Cache-Control': 'no-cache'
                     }
                 });
 
