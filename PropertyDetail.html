@@ -867,11 +867,11 @@
                     </tr>
                     <tr id="${callId}" style="display: none;">
                         <td colspan="6" style="padding: 12px; background: #1a2535; border-top: 0;">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                <div style="color: #ABB2B9; font-size: 12px; flex: 1;">
+                            <div style="display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start;">
+                                <div style="color: #ABB2B9; font-size: 12px;">
                                     <strong style="color: #F39C12;">Notes:</strong> ${call.notes || 'No notes'}
                                 </div>
-                                <button onclick="editCallNotes(${call.id}, '${(call.notes || '').replace(/'/g, "\\'")}', '${callId}')" style="background: #F39C12; color: white; border: none; padding: 4px 12px; border-radius: 12px; cursor: pointer; font-size: 11px; font-weight: 600; white-space: nowrap; margin-left: 12px;">✏️ Edit</button>
+                                <button onclick="editCallNotes(${call.id}, '${(call.notes || '').replace(/'/g, "\\'")}', '${callId}')" style="background: #F39C12; color: white; border: none; padding: 6px 14px; border-radius: 12px; cursor: pointer; font-size: 11px; font-weight: 600; white-space: nowrap;">✏️ Edit</button>
                             </div>
                         </td>
                     </tr>
