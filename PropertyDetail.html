@@ -432,18 +432,6 @@
                             <div class="info-label">Units</div>
                             <input type="number" id="unitsInput" style="width: 100%; padding: 8px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px; font-size: 14px; margin-top: 5px;">
                         </div>
-                        <div class="info-item" style="margin-top: 12px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                                <div class="info-label">Property Notes</div>
-                                <button type="button" onclick="toggleEditNotes()" style="padding: 4px 12px; background: #F39C12; color: white; border: none; border-radius: 16px; cursor: pointer; font-weight: 600; font-size: 11px; transition: all 0.3s;">✏️ Edit</button>
-                            </div>
-                            <div id="notesDisplay" style="background: #1a2535; padding: 8px; border-radius: 6px; border: 1px solid #3a5268; color: #ABB2B9; font-size: 13px; min-height: 60px; white-space: pre-wrap; word-wrap: break-word;">No notes</div>
-                            <textarea id="notesInput" placeholder="Add property notes..." style="display: none; width: 100%; padding: 8px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px; font-size: 13px; min-height: 60px; margin-top: 5px; font-family: inherit;"></textarea>
-                            <div id="notesButtons" style="display: none; gap: 8px; margin-top: 8px; display: flex;">
-                                <button type="button" onclick="saveNotes()" style="flex: 1; padding: 6px 12px; background: #2ecc71; color: white; border: none; border-radius: 16px; cursor: pointer; font-weight: 600; font-size: 12px;">Save</button>
-                                <button type="button" onclick="cancelEditNotes()" style="flex: 1; padding: 6px 12px; background: #3a5268; color: #ABB2B9; border: none; border-radius: 16px; cursor: pointer; font-weight: 600; font-size: 12px;">Cancel</button>
-                            </div>
-                        </div>
                     </div>
                     <div>
                         <div style="border-bottom: 1px solid #2a3f5f; padding-bottom: 15px;">
@@ -838,8 +826,6 @@
             document.getElementById('propertyManagerEmail').value = property.property_manager_email || '';
             document.getElementById('propertyManagerFirstName').value = property.property_manager_first_name || '';
             document.getElementById('propertyManagerLastName').value = property.property_manager_last_name || '';
-            document.getElementById('notesDisplay').textContent = property.notes || 'No notes';
-            document.getElementById('notesInput').value = property.notes || '';
 
             if (property.url) {
                 document.getElementById('propertyUrl').href = property.url;
@@ -1324,50 +1310,6 @@
                 setTimeout(() => loadPropertyDetails(), 1500);
             } catch (error) {
                 showStatusMessage('Error: ' + error.message, true);
-            }
-        }
-
-        function toggleEditNotes() {
-            const display = document.getElementById('notesDisplay');
-            const input = document.getElementById('notesInput');
-            const buttons = document.getElementById('notesButtons');
-
-            display.style.display = display.style.display === 'none' ? 'block' : 'none';
-            input.style.display = input.style.display === 'none' ? 'block' : 'none';
-            buttons.style.display = buttons.style.display === 'none' ? 'flex' : 'none';
-        }
-
-        function cancelEditNotes() {
-            const propertyId = getPropertyId();
-            const property = window.currentProperty;
-            document.getElementById('notesInput').value = property.notes || '';
-            toggleEditNotes();
-        }
-
-        async function saveNotes() {
-            const propertyId = getPropertyId();
-            const notesValue = document.getElementById('notesInput').value;
-
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'apikey': SUPABASE_API_KEY,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=representation'
-                    },
-                    body: JSON.stringify({ notes: notesValue || null })
-                });
-
-                if (!response.ok) throw new Error('Failed to save notes');
-
-                // Update display
-                document.getElementById('notesDisplay').textContent = notesValue || 'No notes';
-                window.currentProperty.notes = notesValue;
-                toggleEditNotes();
-            } catch (error) {
-                alert('Error saving notes: ' + error.message);
-                console.error('Save notes error:', error);
             }
         }
 
