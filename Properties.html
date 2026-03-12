@@ -383,6 +383,16 @@
             }
         }
 
+        function parseDate(dateStr) {
+            // Parse date string without timezone conversion
+            if (!dateStr) return null;
+            const parts = dateStr.split('T')[0].split('-');
+            if (parts.length === 3) {
+                return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            }
+            return new Date(dateStr);
+        }
+
         function getLatestActivity(propertyId) {
             // Get all calls and emails for this property, sorted by date
             const propertyCalls = allCalls.filter(c => c.property_id === propertyId) || [];
@@ -390,15 +400,21 @@
 
             // Get the latest date from either calls or emails
             let latestDate = null;
+            let latestDateStr = '';
             let activities = [];
 
             // Process calls
             propertyCalls.forEach(call => {
-                const callDate = new Date(call.date_called);
+                const callDate = parseDate(call.date_called);
+                const dateStr = call.date_called ? call.date_called.split('T')[0] : '';
+
                 if (!latestDate || callDate > latestDate) {
                     latestDate = callDate;
+                    latestDateStr = dateStr;
                     activities = [];
-                } else if (callDate.toDateString() !== latestDate.toDateString()) {
+                } else if (dateStr === latestDateStr) {
+                    // Same day, add activity
+                } else {
                     return;
                 }
 
@@ -415,11 +431,14 @@
 
             // Process emails
             propertyEmails.forEach(email => {
-                const emailDate = new Date(email.date_sent);
+                const emailDate = parseDate(email.date_sent);
+                const dateStr = email.date_sent ? email.date_sent.split('T')[0] : '';
+
                 if (!latestDate || emailDate > latestDate) {
                     latestDate = emailDate;
+                    latestDateStr = dateStr;
                     activities = ['EM'];
-                } else if (emailDate.toDateString() === latestDate.toDateString()) {
+                } else if (dateStr === latestDateStr) {
                     if (!activities.includes('EM')) activities.push('EM');
                 }
             });
