@@ -381,7 +381,7 @@
 
                 row.innerHTML = `
                     <td><a href="PropertyDetail.html?id=${prop.property_id}" style="color: #F39C12; font-weight: 600; text-decoration: none; cursor: pointer;">${prop.property_id || 'N/A'}</a></td>
-                    <td><span class="property-name">${prop.property_name || 'N/A'}</span></td>
+                    <td><a href="PropertyDetail.html?id=${prop.property_id}" style="color: #5D9CEC; font-weight: 600; text-decoration: none; cursor: pointer;">${prop.property_name || 'N/A'}</a></td>
                     <td>${prop.address || 'N/A'}</td>
                     <td>${prop.phone_number || 'N/A'}</td>
                     <td>${prop.units || 'N/A'}</td>
