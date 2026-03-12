@@ -801,12 +801,7 @@
 
         // Get current user name and date
         function setWelcomeInfo() {
-            const today = new Date();
-            const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-            let welcomeName = currentAgentFilter === 'All' ? 'WELCOME!' : `WELCOME, ${currentAgentFilter.toUpperCase()}!`;
-            document.getElementById('welcomeText').textContent = welcomeName;
-            document.getElementById('dateText').textContent = `Today is ${dateStr}. Real Estate Call CRM.`;
+            // Welcome header has been removed from UI
         }
 
         const SUPABASE_EDITOR_URL = 'https://supabase.com/dashboard/project/blhxgcncijmxxhleqmri/editor';
