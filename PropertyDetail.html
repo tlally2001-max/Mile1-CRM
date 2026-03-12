@@ -437,7 +437,13 @@
                         <div style="border-bottom: 1px solid #2a3f5f; padding-bottom: 15px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                                 <div class="info-label">Status Tracking</div>
-                                <button type="button" onclick="markPropertyAsNo()" style="padding: 6px 16px; background: #ef4444; color: white; border: none; border-radius: 16px; cursor: pointer; font-weight: 600; font-size: 12px; transition: all 0.3s;">❌ NO</button>
+                                <select id="noReasonSelect" onchange="markPropertyAsNo()" style="padding: 6px 16px; background: #ef4444; color: white; border: none; border-radius: 16px; cursor: pointer; font-weight: 600; font-size: 12px;">
+                                    <option value="">❌ Select NO Reason...</option>
+                                    <option value="No - installed">NO - installed</option>
+                                    <option value="No - Not interested">NO - Not interested</option>
+                                    <option value="No - DNC">NO - DNC</option>
+                                    <option value="No - unapproved zip">NO - unapproved zip</option>
+                                </select>
                             </div>
 
                             <div class="info-item" style="margin-bottom: 12px;">
@@ -1407,7 +1413,15 @@
 
         async function markPropertyAsNo() {
             const propertyId = getPropertyId();
-            if (!confirm('Mark this property as "NO" - it will not count in pipeline. Continue?')) {
+            const reason = document.getElementById('noReasonSelect').value;
+
+            if (!reason) {
+                showStatusMessage('Please select a NO reason', true);
+                return;
+            }
+
+            if (!confirm(`Mark this property as "${reason}" - it will not count in pipeline. Continue?`)) {
+                document.getElementById('noReasonSelect').value = '';
                 return;
             }
 
@@ -1419,15 +1433,16 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        status: 'No Access'
+                        status: reason
                     })
                 });
 
                 if (!response.ok) throw new Error('Failed to mark property as NO');
-                showStatusMessage('Property marked as NO - removed from pipeline!');
+                showStatusMessage(`Property marked as ${reason}!`);
                 setTimeout(() => loadPropertyDetails(), 1500);
             } catch (error) {
                 showStatusMessage('Error: ' + error.message, true);
+                document.getElementById('noReasonSelect').value = '';
             }
         }
 
