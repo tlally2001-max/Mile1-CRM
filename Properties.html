@@ -426,10 +426,10 @@
 
             if (!latestDate) return '';
 
-            // Format: M/D abbr1 abbr2...
+            // Format: M/D abbr1, abbr2, abbr3
             const month = latestDate.getMonth() + 1;
             const day = latestDate.getDate();
-            return `${month}/${day} ${activities.join(' ')}`;
+            return `${month}/${day} ${activities.join(', ')}`;
         }
 
         function displayProperties(properties) {
