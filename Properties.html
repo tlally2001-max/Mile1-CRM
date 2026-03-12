@@ -489,134 +489,24 @@
 
             activities.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-            let html = '';
-
-            // History section
-            if (activities.length > 0) {
-                html += '<div style="margin-bottom: 15px;"><div style="color: #F39C12; font-size: 12px; font-weight: 600; margin-bottom: 10px;">Activity History:</div>';
-                activities.forEach(activity => {
-                    const date = new Date(activity.date);
-                    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    const activityType = activity.type === 'call' ? activity.interaction : `Emailed (${activity.status})`;
-                    const notes = activity.notes ? `<br><span style="color: #ABB2B9; font-size: 11px; margin-left: 20px;">Notes: ${activity.notes}</span>` : '';
-
-                    html += `<div style="padding: 8px 0; border-bottom: 1px solid #3a5268;">
-                        <div style="color: #ABB2B9; font-size: 12px;">${dateStr} - ${activityType}</div>
-                        ${notes}
-                    </div>`;
-                });
-                html += '</div>';
-            } else {
-                html += '<div style="color: #ABB2B9; font-size: 12px; margin-bottom: 15px;">No activity recorded</div>';
+            if (activities.length === 0) {
+                return '<div style="color: #ABB2B9; font-size: 12px;">No activity recorded</div>';
             }
 
-            // Log Call Form
-            const today = new Date().toISOString().split('T')[0];
-            html += `
-                <div style="margin-bottom: 15px; padding: 12px; background: #1a2535; border-radius: 6px; border: 1px solid #3a5268;">
-                    <div style="color: #F39C12; font-size: 12px; font-weight: 600; margin-bottom: 8px;">📞 Log New Call</div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: end;">
-                        <input type="date" id="callDate-${propertyId}" value="${today}" style="padding: 6px; background: #263549; border: 1px solid #3a5268; color: #fff; border-radius: 4px; font-size: 11px;">
-                        <select id="callType-${propertyId}" style="padding: 6px; background: #263549; border: 1px solid #3a5268; color: #fff; border-radius: 4px; font-size: 11px;">
-                            <option value="Spoke With">Spoke With</option>
-                            <option value="Voicemail">Voicemail</option>
-                            <option value="No Answer">No Answer</option>
-                            <option value="Wrong Number">Wrong Number</option>
-                        </select>
-                        <button onclick="saveNewCall('${propertyId}')" style="padding: 6px 12px; background: #34A853; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600;">Save</button>
-                    </div>
-                    <textarea id="callNotes-${propertyId}" placeholder="Notes..." style="width: 100%; padding: 6px; margin-top: 6px; background: #263549; border: 1px solid #3a5268; color: #fff; border-radius: 4px; font-size: 11px; min-height: 35px; resize: vertical;"></textarea>
-                </div>
+            let html = '';
+            activities.forEach(activity => {
+                const date = new Date(activity.date);
+                const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const activityType = activity.type === 'call' ? activity.interaction : `Emailed (${activity.status})`;
+                const notes = activity.notes ? `<br><span style="color: #ABB2B9; font-size: 11px; margin-left: 20px;">Notes: ${activity.notes}</span>` : '';
 
-                <div style="padding: 12px; background: #1a2535; border-radius: 6px; border: 1px solid #3a5268;">
-                    <div style="color: #F39C12; font-size: 12px; font-weight: 600; margin-bottom: 8px;">✉️ Log New Email</div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: end;">
-                        <input type="date" id="emailDate-${propertyId}" value="${today}" style="padding: 6px; background: #263549; border: 1px solid #3a5268; color: #fff; border-radius: 4px; font-size: 11px;">
-                        <select id="emailStatus-${propertyId}" style="padding: 6px; background: #263549; border: 1px solid #3a5268; color: #fff; border-radius: 4px; font-size: 11px;">
-                            <option value="Sent">Sent</option>
-                            <option value="No Response">No Response</option>
-                            <option value="Responded">Responded</option>
-                        </select>
-                        <button onclick="saveNewEmail('${propertyId}')" style="padding: 6px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600;">Save</button>
-                    </div>
-                    <textarea id="emailNotes-${propertyId}" placeholder="Notes..." style="width: 100%; padding: 6px; margin-top: 6px; background: #263549; border: 1px solid #3a5268; color: #fff; border-radius: 4px; font-size: 11px; min-height: 35px; resize: vertical;"></textarea>
-                </div>
-            `;
+                html += `<div style="padding: 8px 0; border-bottom: 1px solid #3a5268;">
+                    <div style="color: #F39C12; font-size: 12px; font-weight: 600;">${dateStr} - ${activityType}</div>
+                    ${notes}
+                </div>`;
+            });
 
             return html;
-        }
-
-        async function saveNewCall(propertyId) {
-            const date = document.getElementById(`callDate-${propertyId}`).value;
-            const type = document.getElementById(`callType-${propertyId}`).value;
-            const notes = document.getElementById(`callNotes-${propertyId}`).value;
-
-            if (!date) {
-                alert('Please select a date');
-                return;
-            }
-
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/calls`, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SUPABASE_API_KEY,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=representation'
-                    },
-                    body: JSON.stringify({
-                        property_id: propertyId,
-                        date_called: date,
-                        interaction_type: type,
-                        notes: notes
-                    })
-                });
-
-                if (!response.ok) throw new Error('Failed to save call');
-
-                alert('Call logged successfully!');
-                // Reload data
-                loadProperties();
-            } catch (error) {
-                alert('Error saving call: ' + error.message);
-            }
-        }
-
-        async function saveNewEmail(propertyId) {
-            const date = document.getElementById(`emailDate-${propertyId}`).value;
-            const status = document.getElementById(`emailStatus-${propertyId}`).value;
-            const notes = document.getElementById(`emailNotes-${propertyId}`).value;
-
-            if (!date) {
-                alert('Please select a date');
-                return;
-            }
-
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/emails`, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SUPABASE_API_KEY,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=representation'
-                    },
-                    body: JSON.stringify({
-                        property_id: propertyId,
-                        date_sent: date,
-                        status: status,
-                        notes: notes,
-                        email_type: 'Follow-up'
-                    })
-                });
-
-                if (!response.ok) throw new Error('Failed to save email');
-
-                alert('Email logged successfully!');
-                // Reload data
-                loadProperties();
-            } catch (error) {
-                alert('Error saving email: ' + error.message);
-            }
         }
 
         function displayProperties(properties) {
