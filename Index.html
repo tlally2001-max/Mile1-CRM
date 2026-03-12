@@ -982,7 +982,7 @@
             installs.forEach(install => {
                 html += `
                     <tr style="border-bottom: 1px solid #3a5268;">
-                        <td style="padding: 12px; color: #FFFFFF;"><strong>${install.propertyName || '-'}</strong></td>
+                        <td style="padding: 12px; color: #FFFFFF;"><strong><a href="#" onclick="viewPropertyDetail('${install.propertyId}'); return false;" style="color: #5D9CEC; text-decoration: none; cursor: pointer;">${install.propertyName || '-'}</a></strong></td>
                         <td style="padding: 12px; color: #FFFFFF; font-size: 11px;">${install.address || '-'}</td>
                         <td style="padding: 12px; text-align: center; color: #FFFFFF;">${install.units || 0}</td>
                         <td style="padding: 12px; text-align: center; color: #F39C12; font-weight: 600;">${install.installDate || '-'}</td>
