@@ -696,7 +696,7 @@
         // Get property ID from URL parameter
         function getPropertyId() {
             const params = new URLSearchParams(window.location.search);
-            return params.get('propertyId');
+            return params.get('propertyId') || params.get('id');
         }
 
         // Fetch data from Supabase
