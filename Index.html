@@ -834,6 +834,10 @@
             window.location.href = 'Properties.html';
         }
 
+        function viewPropertyDetail(propertyId) {
+            window.location.href = `PropertyDetail.html?propertyId=${propertyId}`;
+        }
+
         // Format date for display
         function formatDate(dateStr) {
             if (!dateStr) return '';
