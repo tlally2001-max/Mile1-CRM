@@ -632,6 +632,12 @@
             let weeklyVolume = {};
             let interactionBreakdown = {};
 
+            // Create property name lookup
+            const propertyNameMap = {};
+            propertiesData.forEach(prop => {
+                propertyNameMap[prop.property_id] = prop.property_name || prop.address || prop.property_id;
+            });
+
             // Initialize weekly volume
             for (let i = 0; i < 7; i++) {
                 const date = new Date(sevenDaysAgo);
@@ -669,8 +675,8 @@
                         dueTodayCount++;
                         const daysOverdue = Math.floor((today - nextFollowupDate) / (1000 * 60 * 60 * 24));
                         todaysFollowups.push({
-                            property: call.property_id || 'Unknown',
-                            address: call.property_id || 'Unknown',
+                            propertyId: call.property_id || 'Unknown',
+                            property: propertyNameMap[call.property_id] || call.property_id || 'Unknown',
                             interaction: call.interaction_type || 'Unknown',
                             followupDate: formatDateForDisplay(nextFollowupDate),
                             daysOverdue: daysOverdue
@@ -939,7 +945,7 @@
                 const statusText = followup.daysOverdue > 0 ? 'Overdue' : 'Due Today';
                 html += `
                     <tr>
-                        <td><strong>${followup.property || '-'}</strong></td>
+                        <td><strong><a href="#" onclick="viewPropertyDetail('${followup.propertyId}'); return false;" style="color: #5D9CEC; text-decoration: none; cursor: pointer;">${followup.property || '-'}</a></strong></td>
                         <td>${followup.interaction || '-'}</td>
                         <td>${formatDate(followup.followupDate) || '-'}</td>
                         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
