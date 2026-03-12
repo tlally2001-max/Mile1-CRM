@@ -534,7 +534,7 @@
 
                 row.innerHTML = `
                     <td style="color: #ABB2B9; font-size: 12px; cursor: pointer;" onclick="toggleActivityDetails('${prop.property_id}')">
-                        <span id="arrow-${prop.property_id}">▶</span> ${activity}
+                        ${activity} <span id="arrow-${prop.property_id}">▶</span>
                     </td>
                     <td><a href="PropertyDetail.html?id=${prop.property_id}" style="color: #5D9CEC; font-weight: 600; text-decoration: none; cursor: pointer;">${prop.property_name || 'N/A'}</a></td>
                     <td>${prop.address || 'N/A'}</td>
