@@ -279,7 +279,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Property ID</th>
+                            <th>Latest Activity</th>
                             <th>Property Name</th>
                             <th>Address</th>
                             <th>Phone</th>
@@ -309,13 +309,15 @@
         const SUPABASE_API_KEY = "sb_publishable_T9uXncJJ9m-4fV7xDLzWPA_enkmnDHi";
 
         let allProperties = [];
+        let allCalls = [];
+        let allEmails = [];
 
         // Fetch properties from Supabase
         async function loadProperties() {
             try {
                 console.log('Fetching from:', `${SUPABASE_URL}/rest/v1/properties`);
 
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?order=property_id`, {
+                const propsResponse = await fetch(`${SUPABASE_URL}/rest/v1/properties?order=property_id`, {
                     method: 'GET',
                     headers: {
                         'apikey': SUPABASE_API_KEY,
@@ -326,16 +328,39 @@
                     }
                 });
 
-                console.log('Response status:', response.status);
-                const text = await response.text();
-                console.log('Response text:', text);
+                const callsResponse = await fetch(`${SUPABASE_URL}/rest/v1/calls`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    }
+                });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${text}`);
+                const emailsResponse = await fetch(`${SUPABASE_URL}/rest/v1/emails`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    }
+                });
+
+                console.log('Response status:', propsResponse.status);
+                const propsText = await propsResponse.text();
+                const callsText = await callsResponse.text();
+                const emailsText = await emailsResponse.text();
+
+                if (!propsResponse.ok) {
+                    throw new Error(`HTTP ${propsResponse.status}: ${propsText}`);
                 }
 
-                allProperties = JSON.parse(text);
+                allProperties = JSON.parse(propsText);
+                allCalls = callsResponse.ok ? JSON.parse(callsText) : [];
+                allEmails = emailsResponse.ok ? JSON.parse(emailsText) : [];
                 console.log('Loaded properties:', allProperties);
+                console.log('Loaded calls:', allCalls);
+                console.log('Loaded emails:', allEmails);
 
                 document.getElementById('loading').style.display = 'none';
                 populateAgentFilter();
@@ -358,6 +383,55 @@
             }
         }
 
+        function getLatestActivity(propertyId) {
+            // Get all calls and emails for this property, sorted by date
+            const propertyCalls = allCalls.filter(c => c.property_id === propertyId) || [];
+            const propertyEmails = allEmails.filter(e => e.property_id === propertyId) || [];
+
+            // Get the latest date from either calls or emails
+            let latestDate = null;
+            let activities = [];
+
+            // Process calls
+            propertyCalls.forEach(call => {
+                const callDate = new Date(call.date_called);
+                if (!latestDate || callDate > latestDate) {
+                    latestDate = callDate;
+                    activities = [];
+                } else if (callDate.toDateString() !== latestDate.toDateString()) {
+                    return;
+                }
+
+                // Convert interaction type to abbreviation
+                const type = call.interaction_type || '';
+                let abbr = '';
+                if (type.toLowerCase() === 'spoke with') abbr = 'SPK';
+                else if (type.toLowerCase() === 'voicemail') abbr = 'LVM';
+                else if (type.toLowerCase() === 'no answer') abbr = 'NA';
+                else if (type.toLowerCase() === 'wrong number') abbr = 'WN';
+
+                if (abbr && !activities.includes(abbr)) activities.push(abbr);
+            });
+
+            // Process emails
+            propertyEmails.forEach(email => {
+                const emailDate = new Date(email.date_sent);
+                if (!latestDate || emailDate > latestDate) {
+                    latestDate = emailDate;
+                    activities = ['EM'];
+                } else if (emailDate.toDateString() === latestDate.toDateString()) {
+                    if (!activities.includes('EM')) activities.push('EM');
+                }
+            });
+
+            if (!latestDate) return '';
+
+            // Format: M/D abbr1 abbr2...
+            const month = latestDate.getMonth() + 1;
+            const day = latestDate.getDate();
+            return `${month}/${day} ${activities.join(' ')}`;
+        }
+
         function displayProperties(properties) {
             const tableBody = document.getElementById('propertiesTable');
             const tableContainer = document.getElementById('tableContainer');
@@ -378,9 +452,10 @@
                 const row = document.createElement('tr');
                 const statusBadge = getStatusBadge(prop.status);
                 const priorityBadge = getPriorityBadge(prop.priority);
+                const activity = getLatestActivity(prop.property_id);
 
                 row.innerHTML = `
-                    <td><a href="PropertyDetail.html?id=${prop.property_id}" style="color: #F39C12; font-weight: 600; text-decoration: none; cursor: pointer;">${prop.property_id || 'N/A'}</a></td>
+                    <td style="color: #ABB2B9; font-size: 12px;">${activity}</td>
                     <td><a href="PropertyDetail.html?id=${prop.property_id}" style="color: #5D9CEC; font-weight: 600; text-decoration: none; cursor: pointer;">${prop.property_name || 'N/A'}</a></td>
                     <td>${prop.address || 'N/A'}</td>
                     <td>${prop.phone_number || 'N/A'}</td>
