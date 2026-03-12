@@ -451,6 +451,64 @@
             return `${month}/${day} ${activities.join(', ')}`;
         }
 
+        function toggleActivityDetails(propertyId) {
+            const detailsRow = document.getElementById(`details-${propertyId}`);
+            const arrow = document.getElementById(`arrow-${propertyId}`);
+
+            if (detailsRow.style.display === 'none' || !detailsRow.style.display) {
+                detailsRow.style.display = 'table-row';
+                arrow.textContent = '▼';
+            } else {
+                detailsRow.style.display = 'none';
+                arrow.textContent = '▶';
+            }
+        }
+
+        function getActivityDetails(propertyId) {
+            const propertyCalls = allCalls.filter(c => c.property_id === propertyId) || [];
+            const propertyEmails = allEmails.filter(e => e.property_id === propertyId) || [];
+
+            // Combine and sort by date descending
+            const activities = [];
+            propertyCalls.forEach(call => {
+                activities.push({
+                    date: call.date_called,
+                    type: 'call',
+                    interaction: call.interaction_type,
+                    notes: call.notes || ''
+                });
+            });
+            propertyEmails.forEach(email => {
+                activities.push({
+                    date: email.date_sent,
+                    type: 'email',
+                    status: email.status,
+                    notes: email.notes || ''
+                });
+            });
+
+            activities.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (activities.length === 0) {
+                return '<tr id="details-TEMP" style="display: none; background: #263549;"><td colspan="8" style="padding: 15px; color: #ABB2B9; font-size: 12px;">No activity recorded</td></tr>';
+            }
+
+            let html = '';
+            activities.forEach(activity => {
+                const date = new Date(activity.date);
+                const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const activityType = activity.type === 'call' ? activity.interaction : `Emailed (${activity.status})`;
+                const notes = activity.notes ? `<br><span style="color: #ABB2B9; font-size: 11px; margin-left: 20px;">Notes: ${activity.notes}</span>` : '';
+
+                html += `<div style="padding: 8px 0; border-bottom: 1px solid #3a5268;">
+                    <div style="color: #F39C12; font-size: 12px; font-weight: 600;">${dateStr} - ${activityType}</div>
+                    ${notes}
+                </div>`;
+            });
+
+            return html;
+        }
+
         function displayProperties(properties) {
             const tableBody = document.getElementById('propertiesTable');
             const tableContainer = document.getElementById('tableContainer');
@@ -468,13 +526,16 @@
             tableBody.innerHTML = '';
 
             properties.forEach(prop => {
+                // Main row
                 const row = document.createElement('tr');
                 const statusBadge = getStatusBadge(prop.status);
                 const priorityBadge = getPriorityBadge(prop.priority);
                 const activity = getLatestActivity(prop.property_id);
 
                 row.innerHTML = `
-                    <td style="color: #ABB2B9; font-size: 12px;">${activity}</td>
+                    <td style="color: #ABB2B9; font-size: 12px; cursor: pointer;" onclick="toggleActivityDetails('${prop.property_id}')">
+                        <span id="arrow-${prop.property_id}">▶</span> ${activity}
+                    </td>
                     <td><a href="PropertyDetail.html?id=${prop.property_id}" style="color: #5D9CEC; font-weight: 600; text-decoration: none; cursor: pointer;">${prop.property_name || 'N/A'}</a></td>
                     <td>${prop.address || 'N/A'}</td>
                     <td>${prop.phone_number || 'N/A'}</td>
@@ -483,8 +544,22 @@
                     <td>${priorityBadge}</td>
                     <td>${statusBadge}</td>
                 `;
-
                 tableBody.appendChild(row);
+
+                // Expanded details row
+                const detailsRow = document.createElement('tr');
+                detailsRow.id = `details-${prop.property_id}`;
+                detailsRow.style.display = 'none';
+                detailsRow.style.background = '#1a2535';
+                detailsRow.innerHTML = `
+                    <td colspan="8" style="padding: 15px; border-top: 1px solid #3a5268;">
+                        <div style="color: #ABB2B9; font-size: 13px; font-weight: 600; margin-bottom: 10px;">Activity History:</div>
+                        <div style="padding: 10px; background: #263549; border-radius: 6px; font-size: 12px;">
+                            ${getActivityDetails(prop.property_id)}
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(detailsRow);
             });
 
             document.getElementById('propertyCount').textContent = `Showing ${properties.length} properties`;
