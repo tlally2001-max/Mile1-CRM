@@ -191,6 +191,11 @@
             color: #22c55e;
         }
 
+        .badge-no {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
         .badge-high-priority {
             background: rgba(239, 68, 68, 0.2);
             color: #ef4444;
@@ -587,7 +592,11 @@
                 'TPV Sent': 'badge-ia-sent',
                 'TPV Signed': 'badge-ia-signed',
                 'Installed': 'badge-installed',
-                'Paid': 'badge-installed'
+                'Paid': 'badge-installed',
+                'NO - Not interested': 'badge-no',
+                'NO - Installed': 'badge-no',
+                'NO - DNC': 'badge-no',
+                'NO - Unapproved zip': 'badge-no'
             };
 
             const badgeClass = badgeMap[status] || 'badge-contacted';
