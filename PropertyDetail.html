@@ -760,6 +760,7 @@
                 }
 
                 const property = properties[0];
+                window.currentProperty = property;
                 displayProperty(property);
 
                 // Fetch related data
@@ -1599,41 +1600,38 @@
 
                 if (!response.ok) throw new Error('Failed to save call');
 
-                // Update property status based on interaction type
-                const interactionType = document.getElementById('interactionType').value;
-                if (interactionType === 'Spoke With') {
-                    const propResponse = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'apikey': SUPABASE_API_KEY,
-                            'Content-Type': 'application/json',
-                            'Prefer': 'return=representation'
-                        },
-                        body: JSON.stringify({ status: 'Contacted' })
-                    });
-                    if (!propResponse.ok) throw new Error('Failed to update property status');
-                } else if (interactionType === 'Voicemail Left' || interactionType === 'Voicemail') {
-                    const propResponse = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'apikey': SUPABASE_API_KEY,
-                            'Content-Type': 'application/json',
-                            'Prefer': 'return=representation'
-                        },
-                        body: JSON.stringify({ status: 'Voicemail Left' })
-                    });
-                    if (!propResponse.ok) throw new Error('Failed to update property status');
-                } else if (interactionType === 'No Answer') {
-                    const propResponse = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'apikey': SUPABASE_API_KEY,
-                            'Content-Type': 'application/json',
-                            'Prefer': 'return=representation'
-                        },
-                        body: JSON.stringify({ status: 'No Answer' })
-                    });
-                    if (!propResponse.ok) throw new Error('Failed to update property status');
+                // Only update property status if it's still in an early stage
+                // Don't regress status once it's at IA/TPV/Installation level
+                const statusHierarchy = ['New', 'No Answer', 'Voicemail Left', 'Contacted',
+                    'IA Sent', 'IA Signed', 'TPV Sent', 'TPV Signed', 'Installed', 'Paid'];
+                const currentStatus = window.currentProperty?.status || 'New';
+                const currentRank = statusHierarchy.indexOf(currentStatus);
+                const iaRank = statusHierarchy.indexOf('IA Sent');
+
+                // Only auto-update status if we haven't reached IA stage yet
+                if (currentRank < iaRank) {
+                    let newStatus = null;
+                    const callInteraction = document.getElementById('interactionType').value;
+                    if (callInteraction === 'Spoke With') newStatus = 'Contacted';
+                    else if (callInteraction === 'Voicemail Left' || callInteraction === 'Voicemail') newStatus = 'Voicemail Left';
+                    else if (callInteraction === 'No Answer') newStatus = 'No Answer';
+
+                    if (newStatus) {
+                        const newRank = statusHierarchy.indexOf(newStatus);
+                        // Only advance status forward, never backwards
+                        if (newRank > currentRank) {
+                            const propResponse = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
+                                method: 'PATCH',
+                                headers: {
+                                    'apikey': SUPABASE_API_KEY,
+                                    'Content-Type': 'application/json',
+                                    'Prefer': 'return=representation'
+                                },
+                                body: JSON.stringify({ status: newStatus })
+                            });
+                            if (!propResponse.ok) throw new Error('Failed to update property status');
+                        }
+                    }
                 }
 
                 // Show success message
