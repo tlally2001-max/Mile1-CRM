@@ -545,7 +545,7 @@
                         </div>
                         <div>
                             <label style="display: block; color: #ABB2B9; font-size: 12px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Interaction Type *</label>
-                            <select id="interactionType" required style="width: 100%; padding: 10px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px;">
+                            <select id="interactionType" required onchange="setFollowupDate7Days()" style="width: 100%; padding: 10px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px;">
                                 <option value="">Select type</option>
                                 <option value="Spoke With">Spoke With</option>
                                 <option value="Voicemail">Voicemail</option>
@@ -1543,17 +1543,22 @@
             document.getElementById('errorText').textContent = '⚠️ ' + message;
         }
 
-        // Set follow-up date to 7 days from call date
+        // Set follow-up date to 7 days from call date (skip if Voicemail)
         function setFollowupDate7Days() {
             const callDateInput = document.getElementById('callDate');
             const nextFollowupInput = document.getElementById('nextFollowup');
+            const interactionType = document.getElementById('interactionType').value;
+
+            if (interactionType === 'Voicemail') {
+                nextFollowupInput.value = '';
+                return;
+            }
 
             if (callDateInput.value) {
                 const callDate = new Date(callDateInput.value);
                 const followupDate = new Date(callDate);
                 followupDate.setDate(followupDate.getDate() + 7);
 
-                // Format date as YYYY-MM-DD for input field
                 const year = followupDate.getFullYear();
                 const month = String(followupDate.getMonth() + 1).padStart(2, '0');
                 const day = String(followupDate.getDate()).padStart(2, '0');
@@ -1569,9 +1574,9 @@
             const callDate = document.getElementById('callDate').value;
             const interactionType = document.getElementById('interactionType').value;
 
-            // Auto-set follow-up date to 7 days
+            // Auto-set follow-up date to 7 days (skip if Voicemail)
             let nextFollowupDate = document.getElementById('nextFollowup').value || null;
-            if (!nextFollowupDate) {
+            if (!nextFollowupDate && interactionType !== 'Voicemail') {
                 const followupDateObj = new Date(callDate);
                 followupDateObj.setDate(followupDateObj.getDate() + 7);
                 const year = followupDateObj.getFullYear();

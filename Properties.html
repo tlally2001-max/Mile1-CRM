@@ -666,8 +666,10 @@
 
                 return matchesSearch && matchesStatus && matchesAgent && matchesPriority;
             }).sort((a, b) => {
-                // Sort by latest activity date descending (most recent first)
-                return getLatestActivityDate(b.property_id) - getLatestActivityDate(a.property_id);
+                // Sort by latest activity date descending; new properties (no activity) sort by ID descending
+                const dateDiff = getLatestActivityDate(b.property_id) - getLatestActivityDate(a.property_id);
+                if (dateDiff !== 0) return dateDiff;
+                return b.property_id.localeCompare(a.property_id);
             });
 
             displayProperties(filtered);
