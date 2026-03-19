@@ -626,6 +626,16 @@
             return `<span class="badge ${badgeClass}">${priority || 'Medium'}</span>`;
         }
 
+        function getLatestActivityDate(propertyId) {
+            const propertyCalls = allCalls.filter(c => c.property_id === propertyId);
+            const propertyEmails = allEmails.filter(e => e.property_id === propertyId);
+            const dates = [
+                ...propertyCalls.map(c => c.date_called ? new Date(c.date_called) : null),
+                ...propertyEmails.map(e => e.date_sent ? new Date(e.date_sent) : null)
+            ].filter(Boolean);
+            return dates.length ? Math.max(...dates.map(d => d.getTime())) : 0;
+        }
+
         function filterProperties() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const statusFilter = document.getElementById('statusFilter').value;
@@ -656,8 +666,8 @@
 
                 return matchesSearch && matchesStatus && matchesAgent && matchesPriority;
             }).sort((a, b) => {
-                // Sort by property_id
-                return a.property_id.localeCompare(b.property_id);
+                // Sort by latest activity date descending (most recent first)
+                return getLatestActivityDate(b.property_id) - getLatestActivityDate(a.property_id);
             });
 
             displayProperties(filtered);
