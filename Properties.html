@@ -266,6 +266,12 @@
                     <option value="Voicemail Left">Voicemail Left</option>
                     <option value="No Answer">No Answer</option>
                     <option value="No Access">No Access</option>
+                    <option disabled style="color:#555;">── NO Statuses ──</option>
+                    <option value="NO - Not interested">NO - Not interested</option>
+                    <option value="NO - Installed">NO - Installed</option>
+                    <option value="NO - DNC">NO - DNC</option>
+                    <option value="NO - Unapproved zip">NO - Unapproved zip</option>
+                    <option value="NO - Pursue">NO - Pursue</option>
                 </select>
                 <select id="agentFilter" onchange="filterProperties()" style="padding: 10px 15px; border: 1px solid #3a5268; border-radius: 6px; background: #1a2535; color: #FFFFFF; font-size: 14px;">
                     <option value="">All Agents</option>
@@ -638,8 +644,9 @@
 
                 const matchesSearch = searchFields.some(field => field.includes(searchTerm));
 
-                // Status filter - exclude "No Access" by default unless specifically selected
-                const matchesStatus = (!statusFilter && prop.status !== 'No Access') || prop.status === statusFilter;
+                // Status filter - exclude NO statuses by default unless specifically selected
+                const isNoStatus = prop.status && prop.status.startsWith('NO -');
+                const matchesStatus = statusFilter ? prop.status === statusFilter : !isNoStatus;
 
                 // Agent filter
                 const matchesAgent = !agentFilter || prop.agent === agentFilter;
