@@ -552,7 +552,7 @@
                     <td style="color: #ABB2B9; font-size: 12px; cursor: pointer;" onclick="toggleActivityDetails('${prop.property_id}')">
                         ${activity} <span id="arrow-${prop.property_id}" style="display: inline-block; transition: transform 0.2s;">▼</span>
                     </td>
-                    <td><a href="PropertyDetail.html?id=${prop.property_id}" style="color: #5D9CEC; font-weight: 600; text-decoration: none; cursor: pointer;">${prop.property_name || 'N/A'}</a></td>
+                    <td>${prop.status === 'NO - Pursue' && prop.pursue_date ? `<span style="color: #F39C12; font-size: 11px; font-weight: 600;">${new Date(prop.pursue_date + 'T00:00:00').toLocaleDateString('en-US', {month: 'numeric', day: 'numeric', year: '2-digit'})}</span> ` : ''}<a href="PropertyDetail.html?id=${prop.property_id}" style="color: #5D9CEC; font-weight: 600; text-decoration: none; cursor: pointer;">${prop.property_name || 'N/A'}</a></td>
                     <td>${prop.address || 'N/A'}</td>
                     <td>${prop.phone_number || 'N/A'}</td>
                     <td>${prop.units || 'N/A'}</td>
