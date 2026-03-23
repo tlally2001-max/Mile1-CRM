@@ -447,6 +447,11 @@
                                 </select>
                             </div>
 
+                            <div id="pursueDateRow" class="info-item" style="margin-bottom: 12px; display: none;">
+                                <div class="info-label">Pursue Date</div>
+                                <input type="date" id="pursueDateInput" onchange="updatePursueDate()" style="width: 100%; padding: 4px 6px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px; font-size: 12px;">
+                            </div>
+
                             <div class="info-item" style="margin-bottom: 12px;">
                                 <div class="info-label">Property Status</div>
                                 <select id="propertyStatusSelect" onchange="updatePropertyStatus()" style="width: 100%; padding: 4px 6px; background: #1a2535; border: 1px solid #3a5268; color: #FFFFFF; border-radius: 6px; font-size: 12px;">
@@ -859,6 +864,11 @@
 
             if (property.url) {
                 document.getElementById('propertyUrl').href = property.url;
+            }
+
+            if (property.status === 'NO - Pursue') {
+                document.getElementById('pursueDateRow').style.display = 'block';
+                document.getElementById('pursueDateInput').value = property.pursue_date || '';
             }
         }
 
@@ -1290,6 +1300,27 @@
             }
         }
 
+        async function updatePursueDate() {
+            const propertyId = getPropertyId();
+            const pursueDate = document.getElementById('pursueDateInput').value;
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ pursue_date: pursueDate || null })
+                });
+
+                if (!response.ok) throw new Error('Failed to update pursue date');
+                showStatusMessage('Pursue date updated!');
+            } catch (error) {
+                showStatusMessage('Error: ' + error.message, true);
+            }
+        }
+
         async function updateInstallDate() {
             const propertyId = getPropertyId();
             const installDate = document.getElementById('installDateInput').value;
@@ -1413,12 +1444,60 @@
             }
         }
 
+        function waitForPursueDate() {
+            return new Promise((resolve) => {
+                const input = document.getElementById('pursueDateInput');
+                const today = new Date().toISOString().split('T')[0];
+                input.value = today;
+                input.min = today;
+                const ok = confirm('Set a pursue date for this property. Click OK after selecting a date, or Cancel to abort.');
+                if (ok && input.value) {
+                    resolve(input.value);
+                } else {
+                    resolve(null);
+                }
+            });
+        }
+
         async function markPropertyAsNo() {
             const propertyId = getPropertyId();
             const reason = document.getElementById('noReasonSelect').value;
 
             if (!reason) {
                 showStatusMessage('Please select a NO reason', true);
+                return;
+            }
+
+            if (reason === 'NO - Pursue') {
+                document.getElementById('pursueDateRow').style.display = 'block';
+                document.getElementById('pursueDateInput').focus();
+                const pursueDate = await waitForPursueDate();
+                if (!pursueDate) {
+                    document.getElementById('noReasonSelect').value = '';
+                    document.getElementById('pursueDateRow').style.display = 'none';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            status: reason,
+                            pursue_date: pursueDate
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('Failed to mark property as NO - Pursue');
+                    showStatusMessage(`Property marked as NO - Pursue (${pursueDate})!`);
+                    setTimeout(() => loadPropertyDetails(), 1500);
+                } catch (error) {
+                    showStatusMessage('Error: ' + error.message, true);
+                    document.getElementById('noReasonSelect').value = '';
+                }
                 return;
             }
 
