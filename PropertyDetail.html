@@ -765,7 +765,7 @@
                 displayProperty(property);
 
                 // Fetch related data
-                const calls = await fetchSupabaseData('calls', `?property_id=eq.${propertyId}`);
+                const calls = await fetchSupabaseData('calls', `?property_id=eq.${propertyId}&order=date_called.desc`);
                 const emails = await fetchSupabaseData('emails', `?property_id=eq.${propertyId}`);
                 const documents = await fetchSupabaseData('documents', `?property_id=eq.${propertyId}`);
                 const installations = await fetchSupabaseData('installations', `?property_id=eq.${propertyId}`);
