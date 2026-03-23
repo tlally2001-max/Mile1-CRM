@@ -1449,7 +1449,6 @@
                 const input = document.getElementById('pursueDateInput');
                 const today = new Date().toISOString().split('T')[0];
                 input.value = today;
-                input.min = today;
                 const ok = confirm('Set a pursue date for this property. Click OK after selecting a date, or Cancel to abort.');
                 if (ok && input.value) {
                     resolve(input.value);
