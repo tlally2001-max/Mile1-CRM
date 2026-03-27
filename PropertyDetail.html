@@ -439,6 +439,7 @@
                                 <div class="info-label">Status Tracking</div>
                                 <select id="noReasonSelect" onchange="markPropertyAsNo()" style="padding: 6px 16px; background: #ef4444; color: white; border: none; border-radius: 16px; cursor: pointer; font-weight: 600; font-size: 12px;">
                                     <option value="">❌ Select NO Reason...</option>
+                                    <option value="New">✅ NEW (Reset)</option>
                                     <option value="NO - Installed">NO - Installed</option>
                                     <option value="NO - Not interested">NO - Not interested</option>
                                     <option value="NO - DNC">NO - DNC</option>
@@ -1487,6 +1488,30 @@
 
             if (!reason) {
                 showStatusMessage('Please select a NO reason', true);
+                return;
+            }
+
+            // Reset to New
+            if (reason === 'New') {
+                try {
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_API_KEY,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=representation'
+                        },
+                        body: JSON.stringify({ status: 'New', pursue_date: null })
+                    });
+                    if (!response.ok) throw new Error('Failed to reset property');
+                    document.getElementById('pursueDateRow').style.display = 'none';
+                    document.getElementById('pursueDateInput').value = '';
+                    showStatusMessage('Property reset to New!');
+                    setTimeout(() => loadPropertyDetails(), 1500);
+                } catch (error) {
+                    showStatusMessage('Error: ' + error.message, true);
+                    document.getElementById('noReasonSelect').value = '';
+                }
                 return;
             }
 
