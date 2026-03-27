@@ -256,7 +256,8 @@
                     onkeyup="filterProperties()"
                 >
                 <select id="statusFilter" onchange="filterProperties()" style="padding: 10px 15px; border: 1px solid #3a5268; border-radius: 6px; background: #1a2535; color: #FFFFFF; font-size: 14px;">
-                    <option value="">Active Properties</option>
+                    <option value="">All</option>
+                    <option value="ACTIVE">Active Properties</option>
                     <option value="Contacted">Contacted</option>
                     <option value="IA Sent">IA Sent</option>
                     <option value="IA Signed">IA Signed</option>
@@ -654,9 +655,19 @@
 
                 const matchesSearch = searchFields.some(field => field.includes(searchTerm));
 
-                // Status filter - exclude NO statuses by default unless specifically selected
+                // Status filter
                 const isNoStatus = prop.status && prop.status.startsWith('NO -');
-                const matchesStatus = statusFilter ? prop.status === statusFilter : !isNoStatus;
+                let matchesStatus;
+                if (statusFilter === '') {
+                    // "All" option - show everything
+                    matchesStatus = true;
+                } else if (statusFilter === 'ACTIVE') {
+                    // "Active Properties" option - exclude NO statuses
+                    matchesStatus = !isNoStatus;
+                } else {
+                    // Specific status selected
+                    matchesStatus = prop.status === statusFilter;
+                }
 
                 // Agent filter
                 const matchesAgent = !agentFilter || prop.agent === agentFilter;
