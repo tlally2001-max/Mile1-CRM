@@ -462,6 +462,12 @@
                                     <option value="TPV Sent">TPV Sent</option>
                                     <option value="TPV Signed">TPV Signed</option>
                                     <option value="Installed">Installed</option>
+                                    <option disabled style="color:#555;">── NO Statuses ──</option>
+                                    <option value="NO - Not interested">NO - Not interested</option>
+                                    <option value="NO - Installed">NO - Installed</option>
+                                    <option value="NO - DNC">NO - DNC</option>
+                                    <option value="NO - Unapproved zip">NO - Unapproved zip</option>
+                                    <option value="NO - Pursue">NO - Pursue</option>
                                 </select>
                             </div>
 
@@ -1281,6 +1287,14 @@
             const status = document.getElementById('propertyStatusSelect').value;
 
             try {
+                // Prepare update data
+                const updateData = { status: status || 'New' };
+
+                // If switching away from "NO - Pursue", clear the pursue date
+                if (status !== 'NO - Pursue') {
+                    updateData.pursue_date = null;
+                }
+
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/properties?property_id=eq.${propertyId}`, {
                     method: 'PATCH',
                     headers: {
@@ -1288,10 +1302,18 @@
                         'Content-Type': 'application/json',
                         'Prefer': 'return=representation'
                     },
-                    body: JSON.stringify({ status: status || 'New' })
+                    body: JSON.stringify(updateData)
                 });
 
                 if (!response.ok) throw new Error('Failed to update property status');
+
+                // Show/hide pursue date row based on status
+                if (status === 'NO - Pursue') {
+                    document.getElementById('pursueDateRow').style.display = 'block';
+                } else {
+                    document.getElementById('pursueDateRow').style.display = 'none';
+                    document.getElementById('pursueDateInput').value = '';
+                }
 
                 showStatusMessage('Property status updated!');
                 setTimeout(() => loadPropertyDetails(), 1000);
