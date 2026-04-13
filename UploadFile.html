@@ -636,9 +636,17 @@
                     document.getElementById('loading').style.display = 'none';
                     const totalMsg = duplicateAddresses.length > 0 ? ` (${duplicateAddresses.length} duplicates skipped)` : '';
                     showMessage(`✓ Successfully uploaded ${transformedData.length} records!${totalMsg}`, 'success');
+
+                    // Redirect after showing success message
                     setTimeout(() => {
-                        window.location.href = 'Index.html';
-                    }, 2000);
+                        try {
+                            window.location.href = './Index.html';
+                        } catch (e) {
+                            console.error('Redirect failed:', e);
+                            // Fallback: try absolute path
+                            window.location.href = '/Index.html';
+                        }
+                    }, 1500);
 
                 } catch (error) {
                     document.getElementById('loading').style.display = 'none';
