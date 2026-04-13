@@ -611,6 +611,7 @@
                 }
 
                 try {
+                    let firstPropertyId = null;
                     const batchSize = 100;
                     for (let i = 0; i < transformedData.length; i += batchSize) {
                         const batch = transformedData.slice(i, i + batchSize);
@@ -629,6 +630,14 @@
                             throw new Error(`Failed to upload batch: ${uploadResponse.statusText}`);
                         }
 
+                        // Capture the property ID from the first batch
+                        if (!firstPropertyId && uploadResponse.ok) {
+                            const uploadedRecords = await uploadResponse.json();
+                            if (uploadedRecords && uploadedRecords.length > 0) {
+                                firstPropertyId = uploadedRecords[0].property_id;
+                            }
+                        }
+
                         const progress = ((i + batch.length) / transformedData.length) * 100;
                         progressFill.style.width = progress + '%';
                     }
@@ -637,14 +646,12 @@
                     const totalMsg = duplicateAddresses.length > 0 ? ` (${duplicateAddresses.length} duplicates skipped)` : '';
                     showMessage(`✓ Successfully uploaded ${transformedData.length} records!${totalMsg}`, 'success');
 
-                    // Redirect after showing success message
+                    // Redirect to the new property detail page
                     setTimeout(() => {
-                        try {
+                        if (firstPropertyId) {
+                            window.location.href = `./PropertyDetail.html?propertyId=${firstPropertyId}`;
+                        } else {
                             window.location.href = './Index.html';
-                        } catch (e) {
-                            console.error('Redirect failed:', e);
-                            // Fallback: try absolute path
-                            window.location.href = '/Index.html';
                         }
                     }, 1500);
 
